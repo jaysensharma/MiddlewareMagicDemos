@@ -1,0 +1,65 @@
+<project name="CDI_Demo" default="deploy">
+<property name="jboss.home" value="/home/userone/jboss-as-7.1.1.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="output.dir" value="build" />
+<property name="src.dir" value="src" />
+<property name="war.name" value="RestServiceWithCDI.war" />
+
+   <path id="jboss.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>  
+   </path>
+
+        <target name="init">
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+        </target>
+	 
+        <target name="build" depends="init">
+           <mkdir dir="${tmp.dir}/WEB-INF/classes"/>
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}/WEB-INF/classes"  includes="*.java" excludes="RestEasyClient.java" classpathref="jboss.classpath" />
+           <copy file="${src.dir}/index.jsp" tofile="${tmp.dir}/index.jsp"/>
+           <copy file="${src.dir}/web.xml" tofile="${tmp.dir}/web.xml"/>
+           <copy file="${src.dir}/MyRestService.java" todir="${tmp.dir}/WEB-INF/classes"/>
+           <copy file="${src.dir}/TestBean.java" todir="${tmp.dir}/WEB-INF/classes"/>
+
+           <!-- Need to place at lease one empty "beans.xml" file inside WEB-INF -->
+           <copy file="${src.dir}/beans.xml" todir="${tmp.dir}/WEB-INF"/>
+   
+           <jar jarfile="${tmp.dir}/${war.name}" basedir="${tmp.dir}" compress="true" />
+           <copy file="${tmp.dir}/${war.name}" tofile="${output.dir}/${war.name}"/>
+
+           <delete includeEmptyDirs="true">
+              <fileset dir="${tmp.dir}"/>
+           </delete> 
+        </target>
+
+        <target name="deploy" depends="build">
+            <echo message="*******************  Deploying the WAR file ${war.name} *********************" />  
+            <echo message="********** ${output.dir}/${war.name} to ${jboss.home}/standalone/deployments **********" />  
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${war.name}"/> 
+                </fileset>
+            </copy>
+            <echo message="*******************  Deployed Successfully   *********************" />  
+        </target>
+
+
+        <target name="client">
+            <echo message="*******************  Client Accessing RestEasy Service *********************" />  
+            <javac srcdir="${src.dir}" destdir="${output.dir}"  includes="*.java" classpathref="jboss.classpath" />  
+            <java classname="client.RestEasyClient">
+                <classpath>
+                    <path refid="jboss.classpath"/>
+                    <pathelement location="${output.dir}"/>
+                </classpath>
+           </java>         
+        </target>
+</project>
+

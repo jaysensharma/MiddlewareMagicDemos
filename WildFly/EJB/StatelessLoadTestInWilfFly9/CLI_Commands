@@ -1,0 +1,35 @@
+/subsystem=ejb3:write-attribute(name=enable-statistics,value=true)
+
+:reload
+
+/deployment=Stateless_EJB_Ear.ear/subdeployment=Stateless_ejb.jar/subsystem=ejb3/stateless-session-bean=AccountBean:read-resource(include-runtime=true)
+
+
+
+/deployment=Stateless_EJB_Ear.ear/subdeployment=Stateless_ejb.jar/subsystem=ejb3/stateless-session-bean=AccountBean:read-resource(include-runtime=true)
+{
+    "outcome" => "success",
+    "result" => {
+        "component-class-name" => "AccountBean",
+        "declared-roles" => [],
+        "execution-time" => 25392L,
+        "invocations" => 50L,
+        "methods" => {"helloWorld" => {
+            "execution-time" => 25392L,
+            "invocations" => 50L,
+            "wait-time" => 139L
+        }},
+        "peak-concurrent-invocations" => 10L,
+        "pool-available-count" => undefined,
+        "pool-create-count" => undefined,
+        "pool-current-size" => undefined,
+        "pool-max-size" => undefined,
+        "pool-name" => undefined,
+        "pool-remove-count" => undefined,
+        "run-as-role" => undefined,
+        "security-domain" => "other",
+        "timers" => [],
+        "wait-time" => 139L,
+        "service" => undefined
+    }
+

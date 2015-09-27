@@ -1,0 +1,14 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0"> 
+  <resource-ref>
+      <description>DB Connection</description>
+      <res-ref-name>some/SQL/Resource</res-ref-name>          <!-- NOTICE -->
+      <jndi-name>java:jboss/exported/MySqlDS</jndi-name>     <!-- NOTICE -->
+      <res-type>javax.sql.DataSource</res-type>
+      <res-auth>Container</res-auth>
+  </resource-ref>
+
+</web-app>
+

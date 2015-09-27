@@ -1,0 +1,68 @@
+<project name="SpringDemo" default="runProducer">
+<property name="spring.lib" value="/NotBackedUp/ByJay/Spring_3.3.0_Library" />
+<property name="activemq.home" value="/NotBackedUp/ByJay/jboss-a-mq-6.0.0.redhat-024" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="output.dir" value="build" />
+<property name="src.dir" value="src" />
+<property name="producer.jar.name" value="jmsSpringProducer.jar" />
+<property name="consumer.jar.name" value="jmsSpringConsumer.jar" />
+
+        <path id="demo.classpath">
+             <fileset dir="${spring.lib}">
+                 <include name="**/*.jar"/>
+             </fileset>
+             <fileset dir="${activemq.home}/system">
+                 <include name="**/*.jar"/>
+             </fileset>
+        </path>
+
+        <target name="init">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+        </target>
+
+        <target name="buildProducer" depends="init">
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}" includes="SpringQueueSender.java" classpathref="demo.classpath" />
+           <copy todir="${tmp.dir}">
+                <fileset dir="${src.dir}" includes="SpringQueueSender.java,Employee.java"/>
+                <fileset dir="${src.dir}" includes="producerApplicationContext.xml"/>
+           </copy>
+           <jar jarfile="${tmp.dir}/${producer.jar.name}" basedir="${tmp.dir}" compress="true"/> 
+           <copy file ="${tmp.dir}/${producer.jar.name}" todir="${output.dir}" />
+        </target>
+
+        <target name="buildConsumer">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}" includes="SpringQueueReceiver.java,MyMessageListener.java,Example*.java" classpathref="demo.classpath" />
+           <copy todir="${tmp.dir}">
+                <fileset dir="${src.dir}" includes="SpringQueueReceiver.java,Employee.java"/>
+                <fileset dir="${src.dir}" includes="consumerApplicationContext.xml"/>
+           </copy>
+           <jar jarfile="${tmp.dir}/${consumer.jar.name}" basedir="${tmp.dir}" compress="true"/> 
+           <copy file ="${tmp.dir}/${consumer.jar.name}" todir="${output.dir}" />
+        </target>
+
+        <target name="runProducer" depends="buildProducer">
+           <delete dir="${tmp.dir}" />
+           <java classname="demo.SpringQueueSender" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${producer.jar.name}"/>
+                  <path refid="demo.classpath"/>
+               </classpath>
+           </java>
+        </target>  
+
+        <target name="runConsumer" depends="buildConsumer">
+           <delete dir="${tmp.dir}" />
+           <java classname="demo.SpringQueueReceiver" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${consumer.jar.name}"/>
+                  <path refid="demo.classpath"/>
+               </classpath>
+           </java>
+        </target>  
+</project>

@@ -1,0 +1,3 @@
+deploy  /home/jaysensharma/mysql-connector-java-5.1.13-bin.jar
+
+/subsystem=datasources/data-source="MySqlDS":add(jndi-name="java:jboss/datasources/MySqlDS",driver-name="mysql-connector-java-5.1.13-bin.jar",connection-url="jdbc:mysql://localhost:3306/testDB",user-name="root",password="redhat")

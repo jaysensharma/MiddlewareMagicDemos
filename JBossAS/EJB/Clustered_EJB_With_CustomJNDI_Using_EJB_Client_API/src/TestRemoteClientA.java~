@@ -1,0 +1,80 @@
+package client;
+import java.util.Properties;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.jboss.ejb.client.ContextSelector;
+import org.jboss.ejb.client.EJBClientConfiguration;
+import org.jboss.ejb.client.EJBClientContext;
+import org.jboss.ejb.client.PropertiesBasedEJBClientConfiguration;
+import org.jboss.ejb.client.remoting.ConfigBasedEJBClientContextSelector;
+import remote.CallerRemote;
+public class TestRemoteClientA
+  {
+	private static String HOST_A = "10.65.223.64";
+	//private static String HOST_B = "10.65.223.122";
+	private static String HOST_B = "10.65.210.59";
+	private static String Username = "ejbone";
+	private static String Password = "password";
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Properties p = new Properties();
+		p.put("remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED","false");
+		p.put("remote.connections", "two");
+
+		p.put("remote.connection.one.port", "4447");
+		p.put("remote.connection.one.host", HOST_A);
+		p.put("remote.connection.one.connect.options.org.xnio.Options.SASL_POLICY_NOANONYMOUS","false");
+		p.put("remote.connection.one.connect.options.org.xnio.Options.SASL_POLICY_NOPLAINTEXT","false");
+		p.put("remote.connection.one.username", Username);
+		p.put("remote.connection.one.password", Password);
+
+
+		p.put("remote.connection.two.port", "4447");
+		p.put("remote.connection.two.host", HOST_B);
+		p.put("remote.connection.two.connect.options.org.xnio.Options.SASL_POLICY_NOANONYMOUS","false");
+		p.put("remote.connection.two.connect.options.org.xnio.Options.SASL_POLICY_NOPLAINTEXT","false");
+		p.put("remote.connection.two.username", Username);
+		p.put("remote.connection.two.password", Password);
+
+
+		p.put("remote.clusters", "ejb");
+		p.put("remote.cluster.ejb.connect.options.org.xnio.Options.SASL_POLICY_NOANONYMOUS", "false");
+		p.put("remote.cluster.ejb.connect.options.org.xnio.Options.SASL_POLICY_NOPLAINTEXT", "false");
+		p.put("remote.cluster.ejb.username", Username);
+		p.put("remote.cluster.ejb.password", Password);
+
+
+  	        EJBClientConfiguration cc = new PropertiesBasedEJBClientConfiguration(p);
+		ContextSelector<EJBClientContext> selector = new ConfigBasedEJBClientContextSelector(cc);
+		EJBClientContext.setSelector(selector);
+
+
+
+		Properties properties = new Properties();
+		properties.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY,"org.jboss.naming.remote.client.InitialContextFactory");
+		properties.put(javax.naming.Context.PROVIDER_URL, "remote://" + HOST_B+ ":4447");
+		properties.put(javax.naming.Context.SECURITY_PRINCIPAL, Username);
+		properties.put(javax.naming.Context.SECURITY_CREDENTIALS, Password);
+
+		try {
+
+			InitialContext ctx = new InitialContext(properties);
+			CallerRemote remote = null;
+			remote = (CallerRemote) ctx.lookup("remoteEJB/CallerBean!remote.CallerRemote");
+			for(int i=0; i<10; i++){
+				System.out.println("\n\t remote.testMethod(i) = "+ remote.testMethod("Test-"+i));
+					Thread.sleep(500);
+			}
+			
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+  }

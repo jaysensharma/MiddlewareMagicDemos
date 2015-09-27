@@ -1,0 +1,50 @@
+<project name="JBossAS712NativeManagementClient" default="all">
+<property name="jboss.home" value="/home/jaysensharma/jboss-as-7.1.2.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="client.jar.name" value="jbossModelAPIClient.jar" />
+
+        <!-- Following 5 Jars are needed for Client. Client Needs the following Jar to be present in the CLASSPATH including -->
+        <path id="jboss.client.classpath">
+           <fileset dir="${jboss.module.dir}/org/jboss/as/controller-client/main">
+               <include name="jboss-as-controller-client*.jar"/>
+           </fileset>  
+           <fileset dir="${jboss.module.dir}/org/jboss/threads/main">
+               <include name="jboss-threads*.jar"/>
+           </fileset>
+           <fileset dir="${jboss.module.dir}/org/jboss/as/protocol/main">
+               <include name="jboss-as-protocol*.jar"/>
+           </fileset>
+
+           <fileset dir="${jboss.module.dir}/org/jboss/dmr/main">
+               <include name="jboss-dmr*.jar"/>
+           </fileset>
+           <fileset dir="${jboss.home}/bin/client" >
+               <include name="jboss-client.jar" />
+           </fileset>  
+        </path>
+	 
+        <target name="all" depends="run" />
+
+        <target name="run">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="NativeManagementClient.java,TestStandaloneModel.java,TestDomainModeModel.java" classpathref="jboss.client.classpath"/>          
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+           <java classname="NativeManagementClient" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+                  <path refid="jboss.client.classpath"/>
+               </classpath>
+           </java>
+        </target>        
+    
+</project>
+
+

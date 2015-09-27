@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DemoCXFService" targetNamespace="http://test.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://test.org" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+<schema xmlns="http://www.w3.org/2001/XMLSchema">
+  <import namespace="http://test.org" schemaLocation="DemoCXFService_schema1.xsd"/>
+</schema>
+  </wsdl:types>
+  <wsdl:message name="processEmployeeSalaryResponse">
+    <wsdl:part name="updatedEmployee" element="tns:updatedEmployee">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processEmployeeSalary">
+    <wsdl:part name="employee" element="tns:employee">
+    </wsdl:part>
+    <wsdl:part name="incrementAmount" element="tns:incrementAmount">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="DemoCXF">
+    <wsdl:operation name="processEmployeeSalary">
+      <wsdl:input name="processEmployeeSalary" message="tns:processEmployeeSalary">
+    </wsdl:input>
+      <wsdl:output name="processEmployeeSalaryResponse" message="tns:processEmployeeSalaryResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DemoCXFServiceSoapBinding" type="tns:DemoCXF">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="processEmployeeSalary">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processEmployeeSalary">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processEmployeeSalaryResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DemoCXFService">
+    <wsdl:port name="DemoCXFPort" binding="tns:DemoCXFServiceSoapBinding">
+      <soap:address location="http://localhost:9090/DemoCXFPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

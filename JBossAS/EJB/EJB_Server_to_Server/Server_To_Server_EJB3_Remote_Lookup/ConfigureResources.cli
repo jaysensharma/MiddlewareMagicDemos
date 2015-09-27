@@ -1,0 +1,59 @@
+#################################################################
+# Removing all Unnecessary & Default Configurations from Server
+#################################################################
+batch
+# first stop the default servers, block until the server is down
+/host=master/server-config=server-one:stop(blocking=true)
+/host=master/server-config=server-two:stop(blocking=true)
+
+/host=master/server-config=server-one:remove
+/host=master/server-config=server-two:remove
+/host=master/server-config=server-three:remove
+/server-group=main-server-group:remove
+/server-group=other-server-group:remove
+
+#################################################################
+# Disabling the "$local" authentication from the Configuration
+#################################################################
+/host=master/core-service=management/security-realm=ApplicationRealm/authentication=local:remove
+
+
+#################################################################
+# EJB server to server call related configuration
+#################################################################
+
+# add the socket binding to the full-sockets, used by the app-main server
+/socket-binding-group=full-sockets/remote-destination-outbound-socket-binding=OutboundEJBOne:add(host=localhost, port=4647)
+
+# add the outbound connections to the remoting subsystem of the full-profile used by app-main server
+/profile=full/subsystem=remoting/remote-outbound-connection=OutboundEJB_ConnectionOne:add(outbound-socket-binding-ref=remote-ejb, security-realm=ejbRealmOne, username=ejbUserOne)
+/profile=full/subsystem=remoting/remote-outbound-connection=OutboundEJB_ConnectionOne/property=SASL_POLICY_NOANONYMOUS:add(value=false)
+/profile=full/subsystem=remoting/remote-outbound-connection=OutboundEJB_ConnectionOne/property=SSL_ENABLED:add(value=false)
+
+/socket-binding-group=full-sockets/remote-destination-outbound-socket-binding=remote-ejb:add(host=localhost, port=4647)
+
+#################################################################
+# Security-Realm configuration
+#################################################################
+#### using    add-user.sh   create a user with name "ejbUserOne"  and password  as "ejbPasswordOne" on the Client Server
+#### Press "yes" When the user creation script asks:
+#### Is this new user going to be used for one AS process to connect to another AS process e.g. slave domain controller?
+####  it will generate an encrypted password., Use it in the below section.
+
+/host=master/core-service=management/security-realm=ejbRealmOne:add()
+/host=master/core-service=management/security-realm=ejbRealmOne/server-identity=secret:add(value=ZWpiUGFzc3dvcmRPbmU=)
+
+
+#################################################################
+# Configuring New Servers & Server Groups
+#################################################################
+/server-group=GroupOne:add(profile=full,socket-binding-group=full-sockets)
+/server-group=GroupOne/jvm=default:add(permgen-size=64m, max-permgen-size=128m)
+/host=master/server-config=JBossServerOne:add(auto-start=true, group=GroupOne, socket-binding-port-offset=100)
+
+
+/server-group=GroupTwo:add(profile=full,socket-binding-group=full-sockets)
+/server-group=GroupTwo/jvm=default:add(permgen-size=64m, max-permgen-size=128m)
+/host=master/server-config=JBossServerTwo:add(auto-start=true, group=GroupTwo, socket-binding-port-offset=200)
+run-batch
+

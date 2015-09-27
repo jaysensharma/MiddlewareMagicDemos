@@ -1,0 +1,80 @@
+<project name="Stateless_EJB_Ear" default="all">
+<property name="jboss.home" value="/NotBackedUp/DELETE/wildfly-9.0.0.Alpha1-SNAPSHOT" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="ear.name" value="Stateless_EJB_Ear.ear" />
+<property name="ejb.jar.name" value="Stateless_ejb.jar" />
+<property name="client.jar.name" value="Stateless_EJB_Client.jar" />
+
+        <path id="jboss.classpath">
+           <fileset dir="${jboss.module.dir}">
+               <include name="**/*.jar"/>
+           </fileset>  
+        </path>
+
+        <!-- Client Needs the following Jar to be present in the CLASSPATH including -->
+        <path id="jboss.new.client.classpath">
+           <fileset dir="${jboss.home}/bin/client">
+               <include name="jboss-client.jar" />
+           </fileset>  
+        </path>
+	 
+        <target name="all" depends="deploy" />
+
+        <target name="build_ear">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />	   
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="Account*.java" excludes="StandaloneClient.java" classpathref="jboss.classpath"/>
+           <copy file="${src.dir}/AccountBean.java" toDir="${tmp.dir}"/> 
+           <copy file="${src.dir}/AccountRemote.java" toDir="${tmp.dir}"/> 
+           <jar jarfile="${tmp.dir}/${ejb.jar.name}" basedir="${tmp.dir}" compress="true" />
+	   <mkdir dir="${tmp.dir}/${ear.name}" />
+	   <mkdir dir="${tmp.dir}/${ear.name}/META-INF"/>
+
+	   <copy file="${tmp.dir}/${ejb.jar.name}" tofile="${tmp.dir}/${ear.name}/${ejb.jar.name}"/>
+	   <jar jarfile="${output.dir}/${ear.name}" basedir="${tmp.dir}/${ear.name}" compress="true" />
+           <delete includeEmptyDirs="true">
+              <fileset dir="${tmp.dir}/ejb3"/>
+           </delete>
+        </target>
+
+
+        <target name="deploy" depends="build_ear">
+            <sleep milliseconds="5"/>
+            <echo message="*******************  Deploying the EJB EAR file ${ear.name} *********************" />  
+            <echo message="********** ${output.dir} to ${jboss.home}/standalone/deployments **********" />  
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${ear.name}"/> 
+                </fileset>
+            </copy>
+            <echo message="*******************  Deployed Successfully   *********************" />  
+        </target>
+
+
+<!--        <target name="run"  depends="deploy">-->
+        <target name="run">
+           <echo message="*******************  Sleeping for 10 sec so that deployment must be completed succesfully *********************" />  
+	   <!--<sleep seconds="10"/>-->
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <copy file="${src.dir}/jboss-ejb-client.properties" toDir="${tmp.dir}"/> 
+           <copy file="${src.dir}/AccountRemote.java" toDir="${tmp.dir}"/> 
+           <copy file="${src.dir}/StandaloneClient.java" toDir="${tmp.dir}"/> 
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}" includes="AccountRemote.java, StandaloneClient.java" classpathref="jboss.classpath"/>          
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+
+           <java classname="client.StandaloneClient" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+                  <path refid="jboss.new.client.classpath"/>
+               </classpath>
+      	       <arg value="1000"/>
+           </java>
+        </target>        
+    
+</project>

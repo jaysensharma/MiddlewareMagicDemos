@@ -1,0 +1,19 @@
+10:59:23,429  INFO ReflectionServiceFactoryBean:366 - Creating Service {http://test.org}DemoCXFService from WSDL: http://localhost:8080/CXFClientLoggingDemo?wsdl
+10:59:23,889  INFO LoggingOutInterceptor:151 - Outbound Message
+---------------------------
+ID: 1
+Address: http://localhost:8080/CXFClientLoggingDemo
+Encoding: UTF-8
+Content-Type: text/xml
+Headers: {Accept=[*/*], SOAPAction=[""]}
+Payload: <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ns2:sayHello xmlns:ns2="http://test.org"><arg0>MiddlewareMagic</arg0></ns2:sayHello></soap:Body></soap:Envelope>
+--------------------------------------
+10:59:23,906  INFO LoggingInInterceptor:151 - Inbound Message
+----------------------------
+ID: 1
+Response-Code: 200
+Encoding: UTF-8
+Content-Type: text/xml;charset=UTF-8
+Headers: {Content-Length=[235], content-type=[text/xml;charset=UTF-8], Date=[Sat, 28 Jan 2012 05:29:23 GMT], Server=[Apache-Coyote/1.1]}
+Payload: <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><ns2:sayHelloResponse xmlns:ns2="http://test.org"><return>Hello JBossAS7 User: MiddlewareMagic</return></ns2:sayHelloResponse></soap:Body></soap:Envelope>
+--------------------------------------

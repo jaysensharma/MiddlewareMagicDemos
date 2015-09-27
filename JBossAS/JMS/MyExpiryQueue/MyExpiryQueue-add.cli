@@ -1,0 +1,11 @@
+connect
+
+#Adding MyQueue
+/subsystem=messaging/hornetq-server=default/jms-queue=MyQueue/:add(entries=["java:jboss/exported/MyQueue"],durable=false)
+
+#Adding MyExpiryQueue
+/subsystem=messaging/hornetq-server=default/jms-queue=MyExpiryQueue/:add(entries=["java:/MyExpiryQueue"],durable=false)
+
+#Adding address-settings for MyQueue
+/subsystem=messaging/hornetq-server=default/address-setting=jms.queue.MyQueue/:add(expiry-address=jms.queue.MyExpiryQueue)
+

@@ -1,0 +1,46 @@
+<project name="Secured EJB Remote" default="all">
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-as-7.1.0.CR1b" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="ejb.jar" value="schedulerEJB.jar" />
+
+        <path id="jboss.classpath">
+           <fileset dir="${jboss.module.dir}">
+               <include name="**/*.jar"/>
+           </fileset>  
+        </path>
+
+        <target name="all" depends="deploy" />
+
+        <target name="build_ejb_jar">
+           <delete dir="${output.dir}" />
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${output.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="*.java" classpathref="jboss.classpath"/> 
+          
+           <jar jarfile="${tmp.dir}/${ejb.jar}" basedir="${tmp.dir}" compress="true" />
+           <copy file="${tmp.dir}/${ejb.jar}" tofile="${output.dir}/${ejb.jar}"/>
+
+           <delete dir="${tmp.dir}"/>
+        </target>
+
+
+        <target name="deploy" depends="build_ejb_jar">
+            <echo message="*******************  Deploying the EAR file ${ear.name} *********************" />  
+            <echo message="********** ${output.dir}/${ejb.jar} to ${jboss.home}/standalone/deployments **********" />  
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${ejb.jar}"/> 
+                </fileset>
+            </copy>
+            <echo message="*******************  Deployed Successfully   *********************" />  
+            <echo message="******************* Check JBoss AS7 Console  *********************" /> 
+        </target>
+   
+</project>
+
+

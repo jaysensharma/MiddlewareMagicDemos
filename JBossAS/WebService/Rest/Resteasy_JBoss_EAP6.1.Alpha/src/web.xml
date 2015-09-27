@@ -1,0 +1,9 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0"> 
+       
+          <!-- Basically you will need to follow any of the 3 options in the following link:  
+            https://docs.jboss.org/author/display/AS7/JAX-RS+Reference+Guide  -->
+
+</web-app>

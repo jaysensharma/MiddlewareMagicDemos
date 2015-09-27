@@ -1,0 +1,71 @@
+<project name="DeploymentAppUsing_DMR" default="deploy">
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-eap-6.0.1" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="client.jar.name" value="appDeployment_DMR_Client.jar" />
+
+
+        <!-- Client Needs the following Jar to be present in the CLASSPATH including -->
+        <path id="jboss.new.client.classpath">
+           <fileset dir="${jboss.module.dir}/org/jboss/as/controller-client/main">
+               <include name="jboss-as-controller-client*.jar"/>
+           </fileset>  
+           <fileset dir="${jboss.module.dir}/org/jboss/as/protocol/main">
+               <include name="jboss-as-protocol*.jar"/>
+           </fileset>  
+           <fileset dir="${jboss.module.dir}/org/jboss/threads/main">
+               <include name="jboss-threads*.jar"/>
+           </fileset>  
+           <fileset dir="${jboss.module.dir}/org/jboss/dmr/main">
+               <include name="jboss-dmr*.jar"/>
+           </fileset>  
+           <fileset dir="${jboss.home}/bin/client" >
+               <include name="jboss-client.jar" />
+           </fileset>  
+           <fileset dir="${jboss.module.dir}/org/jboss/as/cli/main">
+               <include name="jboss-as-cli*.jar"/>
+           </fileset>  
+        </path>
+	 
+        <target name="deploy">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="DeployApplicationUsingDMR.java" classpathref="jboss.new.client.classpath"/>          
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+           <java classname="DeployApplicationUsingDMR" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+                  <path refid="jboss.new.client.classpath"/>
+               </classpath>
+               <arg value="${src.dir}" />
+               <arg value="myapp.war" />
+           </java>
+        </target>       
+
+
+        <target name="undeploy">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="UnDeployApplicationUsingDMR.java" classpathref="jboss.new.client.classpath"/>          
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+           <java classname="UnDeployApplicationUsingDMR" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+                  <path refid="jboss.new.client.classpath"/>
+               </classpath>
+               <arg value="myapp.war" />
+           </java>
+        </target>     
+    
+</project>
+
+

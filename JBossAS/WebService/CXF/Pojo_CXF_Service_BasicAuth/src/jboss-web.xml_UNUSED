@@ -1,0 +1,3 @@
+<jboss-web>
+   <security-domain>cxfservice-security-domain</security-domain>
+</jboss-web>

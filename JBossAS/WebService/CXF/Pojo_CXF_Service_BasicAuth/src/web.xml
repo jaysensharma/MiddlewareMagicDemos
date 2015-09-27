@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    id="TestWebServiceSecurity" version="3.0">
+
+<!--
+  <servlet>
+    <servlet-name>PojoCXFService</servlet-name>
+    <servlet-class>ws.PojoCXFService</servlet-class>
+  </servlet>  
+
+  <servlet-mapping>
+    <servlet-name>PojoCXFService</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+-->
+
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>All resources</web-resource-name>
+        <url-pattern>/*</url-pattern>
+      </web-resource-collection>
+      <auth-constraint>
+        <role-name>TestRole</role-name>
+      </auth-constraint>
+    </security-constraint>
+ 
+    <security-role>
+      <role-name>TestRole</role-name>
+    </security-role>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+    </login-config>    
+</web-app>

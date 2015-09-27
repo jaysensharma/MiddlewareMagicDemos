@@ -1,0 +1,121 @@
+<project name="JBoss_Service" default="post-deploy">
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-as-7.1.2.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="jar.name" value="EJB_CXF_BasicAuthDemo.jar" />
+<property name="src.dir" value="src" />
+<property name="client.src.dir" value="${basedir}/clientSrc" />
+<property name="output.dir" value="build" />
+<property name="client.dir" value="${basedir}/clientStuff" />
+<property name="client.jar.name" value="EJB_CXF_BasicAuth_Client.jar" />
+ 
+   <path id="jboss.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>  
+   </path>
+
+   <path id="client.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>  
+     <fileset dir="${client.dir}">
+        <include name="*.jar"/>
+     </fileset>  
+   </path>
+
+   <taskdef name="wsprovide" classname="org.jboss.ws.tools.ant.WSProvideTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+   <taskdef name="wsconsume" classname="org.jboss.ws.tools.ant.WSConsumeTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+        <target name="init">
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <mkdir dir="${output.dir}/${jar.name}"/>
+           <mkdir dir="${output.dir}/${jar.name}/META-INF/wsdl"/>
+           <delete dir="${client.dir}" />
+           <mkdir dir="${client.dir}"/>
+        </target>
+
+    <target name="build" depends="init">
+       <javac srcdir="${src.dir}" destdir="${output.dir}/${jar.name}"  includes="*.java" excludes="Client.java" classpathref="jboss.classpath"/>
+       <wsprovide
+        	fork="false"
+        	keep="true"
+        	destdir="${output.dir}"
+        	resourcedestdir="${output.dir}/${jar.name}/META-INF/wsdl"
+        	sourcedestdir="${output.dir}"
+        	genwsdl="true" 
+        	verbose="true"
+        	sei="ws.SecureCXF_EJB">
+            	<classpath>
+                	  <pathelement path="${output.dir}/${jar.name}"/>
+            	</classpath>
+      </wsprovide>
+        <copy todir="${output.dir}/${jar.name}">
+	  <fileset dir="${basedir}/src">
+	      <include name="*.properties"/>
+	  </fileset>
+	</copy>  
+    </target>
+
+
+        <target name="deploy" depends="build">
+            <echo message="*******************  Deploying   *********************" />  
+            <echo message="********** ${jar.name} to ${jboss.home}/standalone/deployments **********" />  
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${jar.name}/**"/> 
+                </fileset>
+            </copy>
+            <echo message="The EMPTY '${jar.name}.dodeploy' tells JBoss AS7 to deploy the application"/>
+            <echo message="This file is needed if we want to deploy an exploded application in JBossAS7"/>
+            <copy todir="${jboss.home}/standalone/deployments/">
+	        <fileset dir="${basedir}/src">
+	          <include name="${jar.name}.dodeploy"/>
+	        </fileset>
+	    </copy>   
+            <echo message="*******************  Deployed Successfully   *********************" />  
+        </target>
+  
+        <target name="post-deploy" depends="deploy">
+            <echo message="*******************  NOTE  *********************" />
+            <echo message="***** You should be able to access your WSDL using Browser now *****" />
+            <echo message="http://localhost:8080/EJB_CXF_BasicAuthDemo/SecureCXF_EJB?wsdl" />
+            <echo message="            " />
+            <echo message="            " />
+        </target>
+
+
+        <target name="client">
+             <delete dir="${client.dir}" />
+             <wsconsume
+                      fork="true"
+                      keep="true"
+                      destdir="${client.dir}"
+                      sourcedestdir="${client.dir}"
+                      package="client"
+                      wsdlLocation="service.wsdl"
+                      wsdl="http://localhost:8080/EJB_CXF_BasicAuthDemo/SecureCXF_EJB?wsdl">
+            </wsconsume>
+            <jar jarfile="${client.dir}/${client.jar.name}" basedir="${client.dir}" compress="true" />  
+       </target>
+
+        <target name="run" depends="client">
+            <javac srcdir="${src.dir}" destdir="${client.dir}"  includes="Client.java" classpathref="client.classpath"/>
+            <java classname="client.Client"  >
+	        <classpath>
+	            <pathelement location="${client.dir}"/>
+	            <path refid="client.classpath"/>
+	        </classpath>
+                <arg value="http://localhost:8080/EJB_CXF_BasicAuthDemo/SecureCXF_EJB"/>
+            </java>
+        </target>  
+
+</project>
+
+

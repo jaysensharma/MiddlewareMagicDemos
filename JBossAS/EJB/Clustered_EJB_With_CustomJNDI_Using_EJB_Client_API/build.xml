@@ -1,0 +1,76 @@
+<project name="ClusteredEJB_Demo" default="all">
+<property name="jboss.home" value="/home/jaysensharma/jbossas-7.1.3" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="ejb.jar" value="remoteEJB.jar" />
+<property name="client.jar.name" value="remoteEJBClient.jar" />
+
+        <path id="jboss.classpath">
+           <fileset dir="${jboss.module.dir}">
+               <include name="**/*.jar"/>
+           </fileset>  
+        </path>
+
+        <!-- Client Needs the following Jar to be present in the CLASSPATH including -->
+        <path id="jboss.new.client.classpath">
+           <fileset dir="${jboss.home}/bin/client">
+               <include name="jboss-client.jar" />
+           </fileset>  
+        </path>
+	 
+        <target name="all" depends="deploy" />
+
+        <target name="build_ear">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="*.java" classpathref="jboss.classpath"/>
+           <jar jarfile="${tmp.dir}/${ejb.jar}" basedir="${tmp.dir}" compress="true" />
+           <delete includeEmptyDirs="true">
+              <fileset dir="${tmp.dir}/remote"/>
+           </delete>
+        </target>
+
+
+        <target name="deploy" depends="build_ear">
+            <sleep milliseconds="5"/>
+            <echo message="*******************  Deploying the EJB JAR file ${ejb.jar} *********************" />  
+            <echo message="********** ${output.dir}/${ejb.jar} to ${jboss.home}/standalone_1/deployments **********" />  
+            <echo message="********** ${output.dir}/${ejb.jar} to ${jboss.home}/standalone_2/deployments **********" />  
+
+            <copy todir="${jboss.home}/standalone_1/deployments/">
+                <fileset dir="${tmp.dir}/">
+                  <include name="${ejb.jar}"/> 
+                </fileset>
+            </copy>
+            <copy todir="${jboss.home}/standalone_2/deployments/">
+                <fileset dir="${tmp.dir}/">
+                  <include name="${ejb.jar}"/> 
+                </fileset>
+            </copy>
+            <echo message="*******************  Deployed Successfully   *********************" />  
+        </target>
+
+
+        <target name="run">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <!--copy file="${src.dir}/jboss-ejb-client.properties" toDir="${tmp.dir}"/--> 
+
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="CallerRemote.java,TestRemoteClientA.java" classpathref="jboss.classpath"/>          
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+
+           <java classname="client.TestRemoteClientA" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+                  <path refid="jboss.new.client.classpath"/>
+               </classpath>
+           </java>
+        </target>        
+    
+</project>
+
+

@@ -1,0 +1,7 @@
+How to create Security-Domain using CLI?
+==============================================
+
+
+/subsystem=security/security-domain=cxfservice-security-domain/:add(cache-type=default)
+
+/subsystem=security/security-domain=cxfservice-security-domain/authentication=classic:add(login-modules=[{"code"=>"UsersRoles", "flag"=>"required", "module-options"=>[("usersProperties"=>"cxfservice-users.properties"),("rolesProperties"=>"cxfservice-roles.properties"),("unauthenticatedIdentity"=>"nobody")] }]   )

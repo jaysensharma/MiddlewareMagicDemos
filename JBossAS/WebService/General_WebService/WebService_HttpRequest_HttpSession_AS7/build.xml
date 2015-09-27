@@ -1,0 +1,106 @@
+<project name="JBoss_Service" default="run">
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-as-7.1.1.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="java.home.dir" value="/NotBackedUp/MyJdks/jdk1.6.0_21" />
+<property name="basedir" value="." />
+<property name="tmp.war.dir.name" value="TEMP_GreetingService.war" />
+<property name="war.name" value="GreetingService.war" />
+<property name="src.dir" value="src" />
+<property name="dest.dir" value="build" />
+<property name="client.dir" value="clientStuff" />
+<property name="client.jar.name" value="Greeting-Client.jar" />
+
+   <path id="jboss.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>
+   </path>
+
+   <path id="client.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>
+     <fileset dir="${client.dir}">
+        <include name="*.jar"/>
+     </fileset>
+   </path>
+
+   <taskdef name="wsprovide" classname="org.jboss.ws.tools.ant.WSProvideTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+   <taskdef name="wsconsume" classname="org.jboss.ws.tools.ant.WSConsumeTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+
+        <target name="init">
+           <delete dir="${dest.dir}" />
+           <mkdir dir="${dest.dir}/${tmp.war.dir.name}"/>
+           <mkdir dir="${dest.dir}/${tmp.war.dir.name}/WEB-INF"/>
+           <mkdir dir="${dest.dir}/${tmp.war.dir.name}/WEB-INF/classes"/>
+           <mkdir dir="${dest.dir}" />
+           <delete dir="${client.dir}" />
+           <mkdir dir="${client.dir}"/>
+        </target>
+	 
+    <target name="build" depends="init">
+       <javac srcdir="${src.dir}" destdir="${dest.dir}/${tmp.war.dir.name}/WEB-INF/classes"  includes="*.java" excludes="GreetingServiceClient.java" classpathref="jboss.classpath"/>
+        <copy todir="${dest.dir}/${tmp.war.dir.name}/WEB-INF">
+	  <fileset dir="${src.dir}">
+	      <include name="web.xml"/>
+	  </fileset>
+	</copy>
+       <wsprovide
+        	fork="false"
+        	keep="true"
+        	destdir="${dest.dir}/${tmp.war.dir.name}/WEB-INF/classes"
+        	resourcedestdir="${dest.dir}/${tmp.war.dir.name}/WEB-INF/wsdl"
+        	sourcedestdir="${dest.dir}/${tmp.war.dir.name}/WEB-INF/classes"
+        	genwsdl="true"
+        	verbose="true"
+        	sei="ws.Greeting">
+            	<classpath>
+                	  <pathelement path="${dest.dir}/${tmp.war.dir.name}/WEB-INF/classes"/>
+            	</classpath>
+      </wsprovide>
+      <jar jarfile="${dest.dir}/${war.name}" basedir="${dest.dir}/${tmp.war.dir.name}" compress="true" /> 
+      <delete dir="${dest.dir}/${tmp.war.dir.name}" />
+    </target>
+
+        <target name="deploy" depends="build">
+            <echo message="*******************  Deploying   *********************" />
+            <echo message="********** ${dest.dir}/${dest.dir}/${war.name} to ${jboss.home}/standalone/deployments **********" />
+            <copy file="${dest.dir}/${war.name}" todir="${jboss.home}/standalone/deployments/"/>
+            <echo message="*******************  Deployed Successfully   *********************" />
+        </target>
+
+        <target name="client">
+             <delete dir="${client.dir}" />
+             <wsconsume
+                      fork="true"
+                      keep="true"
+                      destdir="${client.dir}"
+                      sourcedestdir="${client.dir}"
+                      package="client"
+                      wsdl="http://localhost:8080/GreetingService/Greeting?wsdl">
+            </wsconsume>
+            <jar jarfile="${client.dir}/${client.jar.name}" basedir="${client.dir}" compress="true" />
+       </target>
+
+
+        <target name="run" depends="client">
+            <javac srcdir="${src.dir}" destdir="${client.dir}"  includes="GreetingServiceClient.java"/>
+            <java classname="client.GreetingServiceClient" >
+	        <classpath>
+	            <path refid="client.classpath"/>
+                    <path refid="jboss.classpath"/>
+	            <pathelement location="${client.dir}/${client.jar.name}"/>
+	            <pathelement location="${client.dir}"/>
+	        </classpath>
+                <!-- <arg line="http://localhost:8080/GreetingService/Greeting?wsdl" />    -->
+            </java>
+        </target>  
+
+
+</project>

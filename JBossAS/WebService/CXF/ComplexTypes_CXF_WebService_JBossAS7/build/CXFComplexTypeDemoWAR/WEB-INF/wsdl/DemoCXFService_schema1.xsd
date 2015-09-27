@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><xs:schema xmlns="http://test.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://test.org">
+  <xs:complexType name="employee">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="empName" type="xs:string"/>
+      <xs:element minOccurs="0" name="empNo" type="xs:long"/>
+      <xs:element minOccurs="0" name="empSalary" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="employee" nillable="true" type="employee"/>
+  <xs:element name="incrementAmount" nillable="true" type="xs:long"/>
+  <xs:element name="updatedEmployee" nillable="true" type="employee"/>
+</xs:schema>

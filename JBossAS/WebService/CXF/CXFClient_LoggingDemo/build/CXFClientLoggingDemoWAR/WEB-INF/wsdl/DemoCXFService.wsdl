@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DemoCXFService" targetNamespace="http://test.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://test.org" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+<schema xmlns="http://www.w3.org/2001/XMLSchema">
+  <import namespace="http://test.org" schemaLocation="DemoCXFService_schema1.xsd"/>
+</schema>
+  </wsdl:types>
+  <wsdl:message name="sayHelloResponse">
+    <wsdl:part name="parameters" element="tns:sayHelloResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHello">
+    <wsdl:part name="parameters" element="tns:sayHello">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPropertyResponse">
+    <wsdl:part name="parameters" element="tns:getPropertyResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getProperty">
+    <wsdl:part name="parameters" element="tns:getProperty">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="DemoCXF">
+    <wsdl:operation name="sayHello">
+      <wsdl:input name="sayHello" message="tns:sayHello">
+    </wsdl:input>
+      <wsdl:output name="sayHelloResponse" message="tns:sayHelloResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getProperty">
+      <wsdl:input name="getProperty" message="tns:getProperty">
+    </wsdl:input>
+      <wsdl:output name="getPropertyResponse" message="tns:getPropertyResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DemoCXFServiceSoapBinding" type="tns:DemoCXF">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sayHello">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sayHello">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sayHelloResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getProperty">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getProperty">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPropertyResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DemoCXFService">
+    <wsdl:port name="DemoCXFPort" binding="tns:DemoCXFServiceSoapBinding">
+      <soap:address location="http://localhost:9090/DemoCXFPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

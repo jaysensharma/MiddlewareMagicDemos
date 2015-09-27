@@ -1,0 +1,135 @@
+<project name="JBoss_Service" default="deploy">
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-as-7.1.2.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="java.home.dir" value="/NotBackedUp/MyJdks/jdk1.6.0_05" />
+<property name="basedir" value="." />
+<property name="war.dir" value="jaxws-cxfXMLdemo" />
+<property name="war.name" value="jaxws-cxfXMLdemo.war" />
+<property name="src.dir" value="src" />
+<property name="client.src.dir" value="${basedir}/clientSrc" />
+<property name="output.dir" value="build" />
+<property name="client.dir" value="${basedir}/clientStuff" />
+<property name="client.jar.name" value="DemoCXFClient.jar" />
+ 
+   <path id="jboss.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>  
+   </path>
+
+   <path id="client.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>  
+     <fileset dir="${client.dir}">
+        <include name="*.jar"/>
+     </fileset>  
+   </path>
+
+   <taskdef name="wsprovide" classname="org.jboss.ws.tools.ant.WSProvideTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+   <taskdef name="wsconsume" classname="org.jboss.ws.tools.ant.WSConsumeTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+        <target name="init">
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <mkdir dir="${output.dir}/${war.dir}"/>
+           <mkdir dir="${output.dir}/${war.dir}/META-INF"/>
+           <mkdir dir="${output.dir}/${war.dir}/WEB-INF"/>
+           <mkdir dir="${output.dir}/${war.dir}/WEB-INF/classes"/>
+           <delete dir="${client.dir}" />
+           <mkdir dir="${client.dir}/META-INF"/>
+        </target>
+	 
+    <target name="build" depends="init">
+       <javac srcdir="${src.dir}" destdir="${output.dir}/${war.dir}/WEB-INF/classes"  includes="*.java" excludes="Test_CXF_Client.java" classpathref="jboss.classpath"/>
+        <copy todir="${output.dir}/${war.dir}/WEB-INF">
+	  <fileset dir="${basedir}/src">
+	      <include name="web.xml"/>
+	      <include name="jbossws-cxf.xml"/>
+	  </fileset>
+	</copy>  
+
+
+       <wsprovide
+        	fork="false"
+        	keep="true"
+        	destdir="${output.dir}"
+        	resourcedestdir="${output.dir}/${war.dir}/WEB-INF/wsdl"
+        	sourcedestdir="${output.dir}"
+        	genwsdl="true" 
+        	verbose="true"
+        	sei="ws.DemoCXF">
+            	<classpath>
+                	  <pathelement path="${output.dir}/${war.dir}/WEB-INF/classes"/>
+            	</classpath>
+      </wsprovide>
+
+      <jar jarfile="${output.dir}/${war.name}" basedir="${output.dir}/${war.dir}" compress="true" /> 
+      <delete dir="${war.dir}" />
+    </target>
+
+        <target name="deploy" depends="build">
+            <echo message="*******************  Deploying   *********************" />  
+            <echo message="********** ${war.name} to ${jboss.home}/standalone/deployments **********" />  
+            <copy file="${output.dir}/${war.name}" todir="${jboss.home}/standalone/deployments/"/>
+
+            <echo message="*******************  Deployed Successfully   *********************" />  
+        </target>
+  
+        <target name="post-deploy" >
+            <echo message="*******************  NOTE  *********************" />
+            <echo message="***** You should be able to access your WSDL using Browser now *****" />
+            <echo message="                http://localhost:8080/jaxws-cxfXMLdemo?wsdl          " />
+        </target>  
+
+        <target name="client" depends="post-deploy">
+           <delete dir="${client.dir}" />
+           <mkdir dir="${client.dir}"/>             
+             <wsconsume
+                      fork="true"
+                      keep="true"
+                      destdir="${client.dir}"
+                      sourcedestdir="${client.dir}"
+                      package="client"
+                      wsdlLocation="service.wsdl"
+                      wsdl="http://localhost:8080/jaxws-cxfXMLdemo?wsdl">
+            </wsconsume>
+
+
+            <!-- We need to make sure that log4j.properties is present inside client's classpath-->
+            <copy file="${src.dir}/log4j.properties" todir="${client.dir}" />
+
+            <javac srcdir="${src.dir}" destdir="${client.dir}"  includes="Test_CXF_Client.java" classpathref="client.classpath">
+	        <classpath>
+	            <pathelement location="${client.dir}"/>
+	            <path refid="client.classpath"/>
+	        </classpath>
+            </javac>
+
+            <jar jarfile="${client.dir}/${client.jar.name}" basedir="${client.dir}" compress="true" /> 
+
+
+            <!-- Cleaning Client Stuff Directory --> 
+            <delete dir="${client.dir}/client"/> 
+            <delete file="${client.dir}/log4j.properties"/> 
+       </target>
+
+        <target name="run" depends="client">
+            <java classname="client.Test_CXF_Client" fork="true" >
+	        <classpath>
+	            <pathelement location="${client.dir}/DemoCXFClient.jar"/>
+	            <path refid="client.classpath"/>
+	        </classpath>
+                <jvmarg value="-Dorg.apache.cxf.Logger=org.apache.cxf.common.logging.Log4jLogger" />
+                <arg value="http://localhost:8080/jaxws-cxfXMLdemo"/>
+            </java>
+        </target>  
+
+</project>
+
+

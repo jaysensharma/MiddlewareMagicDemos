@@ -1,0 +1,40 @@
+<project name="SingletonStartupService" default="all">
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-eap-6.0.1" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="sar.name" value="mxbeanDemo.sar" />
+
+
+        <path id="jboss.classpath">
+           <fileset dir="${jboss.module.dir}">
+               <include name="**/*.jar"/>
+           </fileset>  
+        </path>
+        <target name="all" depends="deploy" />
+
+        <target name="build_sar">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="*.java" classpathref="jboss.classpath"/>
+           <jar jarfile="${tmp.dir}/${sar.name}" basedir="${tmp.dir}" compress="true" />
+           <copy file="${tmp.dir}/${sar.name}" tofile="${output.dir}/${sar.name}"/>
+           <delete dir="${tmp.dir}"/>
+        </target>
+
+        <target name="deploy" depends="build_sar">
+            <echo message="*******************  Deploying the EAR file ${sar.name} *********************" />  
+            <echo message="********** ${output.dir}/${sar.name} to ${jboss.home}/standalone/deployments **********" />  
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${sar.name}"/> 
+                </fileset>
+            </copy>
+            <echo message="******************* SAR with @MXBean Deployed Successfully   *********************" />  
+        </target>
+
+</project>
+
+

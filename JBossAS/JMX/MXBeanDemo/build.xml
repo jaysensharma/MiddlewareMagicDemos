@@ -1,0 +1,49 @@
+<project name="MXBeanDemo" default="deploy">
+<property name="jboss.home" value="home/userone/jboss-as-7.1.1.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="output.dir" value="build" />
+<property name="src.dir" value="src" />
+<property name="war.name" value="MXBeanDemo.war" />
+
+        <path id="jboss.classpath">
+             <fileset dir="${jboss.module.dir}">
+                 <include name="**/*.jar"/>
+             </fileset>
+        </path>
+
+        <target name="init">
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}/WEB-INF/classes"/>
+        </target>
+
+        <target name="build" depends="init">
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}/WEB-INF/classes"  includes="*.java" classpathref="jboss.classpath" />
+           <copy todir="${tmp.dir}/WEB-INF/classes">
+                <fileset dir="${src.dir}" includes="**/*.java"/>
+           </copy>
+           <copy file="${src.dir}/index.jsp" tofile="${tmp.dir}/index.jsp"/>
+           <copy file="${src.dir}/web.xml" tofile="${tmp.dir}/WEB-INF/web.xml"/>      
+           <jar jarfile="${tmp.dir}/${war.name}" basedir="${tmp.dir}" compress="true"/> 
+
+           <copy file="${tmp.dir}/${war.name}" tofile="${output.dir}/${war.name}"/>
+           <delete includeEmptyDirs="true">
+              <fileset dir="${tmp.dir}"/>
+           </delete>
+        </target>
+
+        <target name="deploy" depends="build">
+            <echo message="*******************  Deploying the WAR file ${war.name} *********************" />
+            <echo message="********** ${output.dir}/${war.name} to ${jboss.home}/standalone/deployments **********" />
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${war.name}"/>
+                </fileset>
+            </copy>
+            <echo message="*******************  Deployed Successfully   *********************" />
+        </target>
+</project>

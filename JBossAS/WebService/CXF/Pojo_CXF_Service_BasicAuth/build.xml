@@ -1,0 +1,137 @@
+<project name="JBoss_Service" default="post-deploy">
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-as-7.1.2.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="war.name" value="Pojo_CXF_Service_BasicAuthDemo.war" />
+<property name="src.dir" value="src" />
+<property name="client.src.dir" value="${basedir}/clientSrc" />
+<property name="output.dir" value="build" />
+<property name="client.dir" value="${basedir}/clientStuff" />
+<property name="client.jar.name" value="Pojo_CXF_Service_BasicAuth_Client.jar" />
+ 
+   <path id="jboss.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>  
+   </path>
+
+   <path id="client.classpath">
+     <fileset dir="${jboss.module.dir}">
+        <include name="**/*.jar"/>
+     </fileset>  
+     <fileset dir="${client.dir}">
+        <include name="${client.jar.name}"/>
+     </fileset>  
+   </path>
+
+   <taskdef name="wsprovide" classname="org.jboss.ws.tools.ant.WSProvideTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+   <taskdef name="wsconsume" classname="org.jboss.ws.tools.ant.WSConsumeTask">
+       <classpath refid="jboss.classpath"/>
+   </taskdef>
+
+        <target name="init">
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <mkdir dir="${output.dir}/${war.name}"/>
+           <mkdir dir="${output.dir}/${war.name}/WEB-INF/wsdl"/>
+           <mkdir dir="${output.dir}/${war.name}/WEB-INF/classes"/>
+           <delete dir="${client.dir}" />
+           <mkdir dir="${client.dir}"/>
+        </target>
+
+    <target name="build" depends="init">
+       <javac srcdir="${src.dir}" destdir="${output.dir}/${war.name}/WEB-INF/classes"  includes="*.java" excludes="Client.java" classpathref="jboss.classpath"/>
+       <!--copy file="${src.dir}/jboss-web.xml" tofile="${output.dir}/${war.name}/WEB-INF/jboss-web.xml"/-->
+       <copy file="${src.dir}/web.xml" tofile="${output.dir}/${war.name}/WEB-INF/web.xml"/>
+       <wsprovide
+        	fork="false"
+        	keep="true"
+        	destdir="${output.dir}/${war.name}/WEB-INF/classes"
+        	resourcedestdir="${output.dir}/${war.name}/META-INF/wsdl"
+        	sourcedestdir="${output.dir}/${war.name}/WEB-INF/classes"
+        	genwsdl="true" 
+        	verbose="true"
+        	sei="ws.PojoCXFService">
+            	<classpath>
+                	  <pathelement path="${output.dir}/${war.name}/WEB-INF/classes"/>
+            	</classpath>
+      </wsprovide>
+        <copy todir="${output.dir}/${war.name}/WEB-INF/classes">
+	  <fileset dir="${basedir}/src">
+	      <include name="*.properties"/>
+	  </fileset>
+	</copy>  
+    </target>
+
+
+        <target name="deploy" depends="build">
+            <echo message="*******************  Deploying   *********************" />  
+            <echo message="********** ${war.name} to ${jboss.home}/standalone/deployments **********" />  
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${war.name}/**"/> 
+                </fileset>
+            </copy>
+            <echo message="The EMPTY '${war.name}.dodeploy' tells JBoss AS7 to deploy the application"/>
+            <echo message="This file is needed if we want to deploy an exploded application in JBossAS7"/>
+            <copy todir="${jboss.home}/standalone/deployments/">
+	        <fileset dir="${basedir}/src">
+	          <include name="${war.name}.dodeploy"/>
+	        </fileset>
+	    </copy>   
+            <echo message="*******************  Deployed Successfully   *********************" />  
+        </target>
+  
+        <target name="post-deploy" depends="deploy">
+            <echo message="*******************  NOTE  *********************" />
+            <echo message="***** You should be able to access your WSDL using Browser now *****" />
+            <echo message="            " />
+            <echo message="            " />
+            <echo message="http://localhost:8080/Pojo_CXF_Service_BasicAuthDemo/PojoCXFService?wsdl" />
+            <echo message="            " />
+            <echo message="            " />
+            <echo message="*******************  NOTE  *********************" />
+            <echo message="***** You should be able to access your WSDL using Browser now *****" />
+            <echo message="http://userone:passwordone@localhost:8080/Pojo_CXF_Service_BasicAuthDemo/PojoCXFService?wsdl" />
+            <echo message="            " />
+            <echo message="            " />
+            <echo message="RMEMBER *** Syntax: " />
+            <echo message="http://BasicUsername:BasicPassword@localhost:8080/Pojo_CXF_Service_BasicAuthDemo/PojoCXFService?wsdl" />
+            <echo message="and then save it in your file system with following name:" />
+            <echo message="${src.dir}/META-INF/wsdl/PojoCXFService.wsdl "/>
+            <echo message="And then run the ' ant client' To generate client artifacts" />
+            <echo message="************************************************" />
+        </target>
+
+
+        <target name="client">
+             <delete dir="${client.dir}" />
+             <wsconsume
+                      fork="true"
+                      keep="true"
+                      destdir="${client.dir}"
+                      sourcedestdir="${client.dir}"
+                      package="client"
+                      wsdlLocation="service.wsdl"
+                      wsdl="${src.dir}/META-INF/wsdl/PojoCXFService.wsdl">
+            </wsconsume>
+            <jar jarfile="${client.dir}/${client.jar.name}" basedir="${client.dir}" compress="true" />  
+       </target>
+
+        <target name="run" depends="client">
+            <javac srcdir="${src.dir}" destdir="${client.dir}"  includes="Client.java" classpathref="client.classpath"/>
+            <java classname="client.Client"  >
+	        <classpath>
+	            <pathelement location="${client.dir}"/>
+	            <path refid="client.classpath"/>
+	        </classpath>
+                <arg value="http://localhost:8080/Pojo_CXF_Service_BasicAuthDemo/PojoCXFService"/>
+            </java>
+        </target>  
+
+</project>
+
+

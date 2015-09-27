@@ -1,0 +1,81 @@
+<project name="RuleEngine_DroolsProject" default="deploy">
+<property name="current.dir" value="." />
+<property name="jboss.home" value="/NotBackedUp/JBoss_All/jboss-as-7.1.0.CR1b" />
+<property name="drools.jar.dir" value="${current.dir}/drools_lib" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="output.dir" value="build" />
+<property name="src.dir" value="src" />
+<property name="war.name" value="DroolsHelloWorldDemo.war" />
+ 
+        <path id="jboss.classpath">
+           <fileset dir="${jboss.module.dir}">
+              <include name="**/*.jar"/>
+           </fileset>
+           <fileset dir="${drools.jar.dir}">
+              <include name="**/*.jar"/>
+           </fileset>
+        </path>
+ 
+        <target name="init">
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+        </target>
+ 
+        <target name="build" depends="init">
+           <mkdir dir="${tmp.dir}/WEB-INF/lib"/>
+           <mkdir dir="${tmp.dir}/WEB-INF/classes"/>
+           <mkdir dir="${tmp.dir}/META-INF"/>
+
+           <copy file="${src.dir}/index.jsp" tofile="${tmp.dir}/index.jsp"/>
+           <copy file="${src.dir}/testRule.drl" todir="${tmp.dir}/WEB-INF/classes"/>
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}/WEB-INF/classes"  includes="*.java" classpathref="jboss.classpath"/>
+
+
+           <!-- NOTE: we are creating a JAR which contains the  "testRule.drl" and the "engine.MyRuleEngine" class -->
+           <jar jarfile="${tmp.dir}/WEB-INF/lib/MyDroolsApp.jar" basedir="${tmp.dir}/WEB-INF/classes" compress="true" />
+
+           <copy todir="${tmp.dir}/WEB-INF">
+                <fileset dir="${src.dir}">
+                  <include name="*.java"/>
+                </fileset>
+           </copy>
+           <delete dir="${tmp.dir}/WEB-INF/classes" />
+
+
+           <!-- MOST IMPORTANT PART== Copy all the drools related Jars inside "WEB-INF/lib" If You don't want to create a JBoss Module 
+           <copy todir="${tmp.dir}/WEB-INF/lib">
+                <fileset dir="${drools.jar.dir}/">
+                  <include name="*.jar"/>
+                </fileset>
+           </copy>
+           -->
+
+           <jar jarfile="${tmp.dir}/${war.name}" basedir="${tmp.dir}"  compress="true" >
+              <manifest>
+                 <!-- Make Sure that the [Dependencies: drools] is added in the ${war.name}/META-INF/MANIFEST.MF file -->
+                 <attribute name="Dependencies" value="drools"/>
+              </manifest>
+           </jar>
+           
+           <copy file="${tmp.dir}/${war.name}" tofile="${output.dir}/${war.name}"/>
+           <delete includeEmptyDirs="true">
+              <fileset dir="${tmp.dir}"/>
+           </delete>
+        </target>
+ 
+        <target name="deploy" depends="build">
+            <echo message="*******************  Deploying the WAR file ${war.name} *********************" />
+            <echo message="********** ${output.dir}/${war.name} to ${jboss.home}/standalone/deployments **********" />
+            <copy todir="${jboss.home}/standalone/deployments/">
+                <fileset dir="${output.dir}/">
+                  <include name="${war.name}"/>
+                </fileset>
+            </copy>
+            <echo message="*******************  Deployed Successfully   *********************" />
+        </target>
+</project>
