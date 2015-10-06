@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <!-- Configuring Spring Jndi Template -->	
+	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+		<property name="environment">
+			<props>
+				<prop key="java.naming.factory.initial">org.jboss.naming.remote.client.InitialContextFactory</prop>
+				<prop key="java.naming.provider.url">http-remoting://localhost:8080</prop>
+			</props>
+		</property>
+	</bean>
+	
+    <!-- Getting ConnectionFactory using Spring Jndi Template -->	
+	<bean id="jmsQueueConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiTemplate">
+			<ref bean="jndiTemplate" />
+		</property>
+		<property name="jndiName">
+			<value>jms/RemoteConnectionFactory</value>
+		</property>
+	</bean>
+
+    <!-- Spring based Security Part, Those are the users created in ApplicationRealm of WildFLy -->
+	<bean id="authenticatedConnectionFactory"
+		class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter">
+		<property name="targetConnectionFactory" ref="jmsQueueConnectionFactory" />
+		<property name="username" value="jmsuser" />
+		<property name="password" value="jmsuser@1" />
+	</bean>
+
+
+	<bean name="jms" class="org.apache.camel.component.jms.JmsComponent">
+		<property name="connectionFactory" ref="authenticatedConnectionFactory" />
+	</bean>
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+		<route>
+			<from uri="file:src/data?noop=true" />  <!-- Any file placed in this dir will be send to TestQ -->
+			<to uri="jms:TestQ" />
+		</route>
+	</camelContext>
+</beans>
