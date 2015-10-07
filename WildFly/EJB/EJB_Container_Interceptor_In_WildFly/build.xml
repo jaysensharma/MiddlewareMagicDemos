@@ -1,0 +1,99 @@
+<project name="EJB_Interceptor_Demo_WildFly" default="all">
+<property name="jboss.home" value="/PATH/TO/wildfly-10.0.0.CR3-SNAPSHOT" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="ear.name" value="testEAR.ear" />
+<property name="ejb.jar.name" value="testEJB.jar" />
+<property name="war.name" value="LocalWebApp.war" />
+<property name="client.jar.name" value="remoteEJBClient.jar" />
+
+        <path id="jboss.classpath">
+           <fileset dir="${jboss.module.dir}/system/layers/base/javax/">
+               <include name="**/*.jar"/>
+           </fileset>  
+           <fileset dir="${tmp.dir}">
+               <include name="${ejb.jar.name}" />
+           </fileset> 
+        </path>
+
+        <!-- Client Needs the following Jar to be present in the CLASSPATH including -->
+        <path id="jboss.new.client.classpath">
+           <fileset dir="${jboss.home}/bin/client">
+               <include name="jboss-client.jar" />
+           </fileset>  
+        </path>
+	 
+        <target name="all" depends="message" />
+
+        <target name="build_ear">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}/META-INF" />
+           <javac srcdir="${src.dir}/EAR_Data" destdir="${tmp.dir}"  includes="Common*.java,Interceptor*.java" classpathref="jboss.classpath"/>
+           <copy file="${src.dir}/EAR_Data/CommonServiceBean.java" todir="${tmp.dir}/ejb/service"/>
+           <copy file="${src.dir}/EAR_Data/CommonService.java" todir="${tmp.dir}/ejb/service"/>
+           <copy file="${src.dir}/EAR_Data/CommonServiceOneBean.java" todir="${tmp.dir}/ejb/service/one"/>
+           <copy file="${src.dir}/EAR_Data/CommonServiceOne.java" todir="${tmp.dir}/ejb/service/one"/>
+           <copy file="${src.dir}/EAR_Data/CommonServiceTwoBean.java" todir="${tmp.dir}/ejb/service/two"/>
+           <copy file="${src.dir}/EAR_Data/CommonServiceTwo.java" todir="${tmp.dir}/ejb/service/two"/>
+           <copy file="${src.dir}/EAR_Data/InterceptorOne.java" todir="${tmp.dir}/interceptors"/>
+           <copy file="${src.dir}/EAR_Data/InterceptorTwo.java" todir="${tmp.dir}/interceptors"/>
+           <copy file="${src.dir}/EAR_Data/InterceptorThree.java" todir="${tmp.dir}/interceptors"/>
+
+           <copy file="${src.dir}/EAR_Data/jboss-ejb3.xml" todir="${tmp.dir}/META-INF"/>
+           <jar jarfile="${tmp.dir}/${ejb.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete includeEmptyDirs="true">
+              <fileset dir="${tmp.dir}/META-INF"/>
+              <fileset dir="${tmp.dir}/ejb"/>
+              <fileset dir="${tmp.dir}/interceptors"/>
+           </delete> 
+
+           <mkdir dir="${tmp.dir}/META-INF"/>
+           <copy todir="${tmp.dir}/META-INF">
+                <fileset dir="${src.dir}/EAR_Data/">
+                  <include name="application.xml"/> 
+                </fileset>
+           </copy>           
+           
+           <jar jarfile="${tmp.dir}/${ear.name}" basedir="${tmp.dir}" compress="true" />
+           <delete includeEmptyDirs="true">
+              <fileset dir="${tmp.dir}/META-INF"/>
+           </delete> 
+           <delete file="${tmp.dir}/${ejb.jar.name}"/>
+
+           <copy file="${tmp.dir}/${ear.name}" tofile="${output.dir}/${ear.name}"/>
+           <delete file="${tmp.dir}/${ear.name}"/>
+        </target>
+
+
+        <target name="message" depends="build_ear">
+            <echo message="*******************  ******************* *********************" />  
+            <copy file="${output.dir}/${ear.name}" tofile="${jboss.home}/standalone/deployments/${ear.name}"/>
+            <echo message="********** ${output.dir}/${ear.name} Build and Deployed Successfully **********" />  
+            <echo message="Check WildFly log" />  
+            <echo message="*******************  ******************* *********************" />  
+        </target>
+
+
+        <target name="run">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}/client" destdir="${tmp.dir}"  includes="CommonService.java,Client.java" classpathref="jboss.classpath"/> 
+           <copy file="${src.dir}/client/CommonService.java" todir="${tmp.dir}/ejb/service"/>
+           <copy file="${src.dir}/client/Client.java" todir="${tmp.dir}/client"/>        
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+
+           <java classname="client.Client" fork="true">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+                  <path refid="jboss.new.client.classpath"/>
+               </classpath>
+           </java>
+        </target>        
+
+</project>
+
+

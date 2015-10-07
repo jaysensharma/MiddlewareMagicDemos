@@ -1,0 +1,14 @@
+<jboss xmlns="http://www.jboss.com/xml/ns/javaee"
+       xmlns:jee="http://java.sun.com/xml/ns/javaee"
+       xmlns:ci ="urn:container-interceptors:1.0">
+    <jee:assembly-descriptor>
+        <ci:container-interceptors>
+            <!-- Class level container-interceptor -->
+            <jee:interceptor-binding>
+                <ejb-name>*</ejb-name> 
+                <interceptor-class>interceptors.InterceptorOne</interceptor-class>
+                <interceptor-class>interceptors.InterceptorTwo</interceptor-class>
+            </jee:interceptor-binding>
+        </ci:container-interceptors>
+    </jee:assembly-descriptor>
+</jboss>
