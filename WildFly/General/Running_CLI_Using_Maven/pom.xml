@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	     
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>middleware.magic</groupId>
+	<artifactId>RunningCLI_ViaMaven</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0</version>
+	
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <wildfly.home>/Users/jsensharma/NotBackedUp/Installed/wildfly-10.0.0.CR3-SNAPSHOT</wildfly.home> <!-- CHANGE ME !!! -->
+        <wildfly.hostname>localhost</wildfly.hostname>   <!-- CHANGE ME !!! -->
+        <wildfly.user>admin</wildfly.user>  <!-- CHANGE ME !!! -->
+        <wildfly.pass>admin@123</wildfly.pass>  <!-- CHANGE ME !!! -->
+        <wildfly.port>9990</wildfly.port>  <!-- CHANGE ME !!! -->
+    </properties>
+
+	<build>
+          <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec dir="${basedir}" executable="${wildfly.home}/bin/jboss-cli.sh" failonerror="true">
+                                  <arg line="--controller=${wildfly.hostname}:${wildfly.port} 
+                                             --user=${wildfly.user} 
+                                             --password=${wildfly.pass} 
+                                             -c file=${basedir}/test.cli" />
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                
+                <dependencies>
+                    <dependency>
+                        <groupId>ant-contrib</groupId>
+                        <artifactId>ant-contrib</artifactId>
+                        <version>20020829</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+	 </plugins>
+     </build>
+</project>
