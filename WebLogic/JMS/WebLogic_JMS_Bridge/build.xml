@@ -1,0 +1,35 @@
+<project name="ApplicationLevelJMSDemo" default="run">
+<property name="wls.home" value="/Users/jsensharma/NotBackedUp/Installed/wls12130" /> <!-- CHANGE ME!! -->
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="output.dir" value="build" />
+<property name="src.dir" value="src" />
+<property name="client.jar.name" value="jms_WLS_Client.jar" />
+
+        <path id="wls.classpath">
+             <fileset dir="${wls.home}">
+                 <include name="**/*.jar"/>
+             </fileset>
+        </path>
+        <target name="init">
+           <delete dir="${output.dir}" />
+           <mkdir dir="${output.dir}" />
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+        </target>
+
+        <target name="run">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="QueueSend.java,QueueReceive.java" classpathref="wls.classpath"/>
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <java classname="QueueSend" fork="true">
+               <classpath>
+                  <pathelement location="${tmp.dir}"/>
+                  <path refid="wls.classpath"/>
+               </classpath>
+               <arg value="t3://localhost:7001"/>
+           </java>
+           <delete dir="${tmp.dir}" />
+        </target>  
+</project>

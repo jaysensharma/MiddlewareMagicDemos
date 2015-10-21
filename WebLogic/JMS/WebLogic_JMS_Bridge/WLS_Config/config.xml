@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<domain xmlns="http://xmlns.oracle.com/weblogic/domain" xmlns:sec="http://xmlns.oracle.com/weblogic/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wls="http://xmlns.oracle.com/weblogic/security/wls" xsi:schemaLocation="http://xmlns.oracle.com/weblogic/security/wls http://xmlns.oracle.com/weblogic/security/wls/1.0/wls.xsd http://xmlns.oracle.com/weblogic/domain http://xmlns.oracle.com/weblogic/1.0/domain.xsd http://xmlns.oracle.com/weblogic/security/xacml http://xmlns.oracle.com/weblogic/security/xacml/1.0/xacml.xsd http://xmlns.oracle.com/weblogic/security/providers/passwordvalidator http://xmlns.oracle.com/weblogic/security/providers/passwordvalidator/1.0/passwordvalidator.xsd http://xmlns.oracle.com/weblogic/security http://xmlns.oracle.com/weblogic/1.0/security.xsd">
+  <name>mydomain</name>
+  <domain-version>12.1.3.0.0</domain-version>
+  <security-configuration>
+    <name>mydomain</name>
+    <realm>
+      <sec:authentication-provider xsi:type="wls:default-authenticatorType">
+        <sec:name>DefaultAuthenticator</sec:name>
+      </sec:authentication-provider>
+      <sec:authentication-provider xsi:type="wls:default-identity-asserterType">
+        <sec:name>DefaultIdentityAsserter</sec:name>
+        <sec:active-type>AuthenticatedUser</sec:active-type>
+      </sec:authentication-provider>
+      <sec:role-mapper xmlns:xac="http://xmlns.oracle.com/weblogic/security/xacml" xsi:type="xac:xacml-role-mapperType">
+        <sec:name>XACMLRoleMapper</sec:name>
+      </sec:role-mapper>
+      <sec:authorizer xmlns:xac="http://xmlns.oracle.com/weblogic/security/xacml" xsi:type="xac:xacml-authorizerType">
+        <sec:name>XACMLAuthorizer</sec:name>
+      </sec:authorizer>
+      <sec:adjudicator xsi:type="wls:default-adjudicatorType">
+        <sec:name>DefaultAdjudicator</sec:name>
+      </sec:adjudicator>
+      <sec:credential-mapper xsi:type="wls:default-credential-mapperType">
+        <sec:name>DefaultCredentialMapper</sec:name>
+      </sec:credential-mapper>
+      <sec:cert-path-provider xsi:type="wls:web-logic-cert-path-providerType">
+        <sec:name>WebLogicCertPathProvider</sec:name>
+      </sec:cert-path-provider>
+      <sec:cert-path-builder>WebLogicCertPathProvider</sec:cert-path-builder>
+      <sec:name>myrealm</sec:name>
+      <sec:password-validator xmlns:pas="http://xmlns.oracle.com/weblogic/security/providers/passwordvalidator" xsi:type="pas:system-password-validatorType">
+        <sec:name>SystemPasswordValidator</sec:name>
+        <pas:min-password-length>8</pas:min-password-length>
+        <pas:min-numeric-or-special-characters>1</pas:min-numeric-or-special-characters>
+      </sec:password-validator>
+    </realm>
+    <default-realm>myrealm</default-realm>
+    <anonymous-admin-lookup-enabled>false</anonymous-admin-lookup-enabled>
+    <credential-encrypted>{AES}d5DXhkKwGcnNlwljHXD8soR4SpIn+aJ5dmK5hkoudP5ybsgZAAPKxLsZc8r2LZT3y8UWXMGNpH205IEYEYzQ8SKRBgTaMTWV3xq1D5ii8pBhe2QjhoeMkTTQYm81jPyq</credential-encrypted>
+    <node-manager-username>weblogic</node-manager-username>
+    <node-manager-password-encrypted>{AES}+MbtHlNInV2LpF6OCHQ7vBtp1DEUhfz8U1Gd7hv+PTo=</node-manager-password-encrypted>
+  </security-configuration>
+  <server>
+    <name>myserver</name>
+    <ssl>
+      <login-timeout-millis>25000</login-timeout-millis>
+    </ssl>
+    <log>
+      <stdout-format>standard</stdout-format>
+      <stacktrace-depth>50</stacktrace-depth>
+    </log>
+    <stuck-thread-max-time>10</stuck-thread-max-time>
+    <stuck-thread-timer-interval>5</stuck-thread-timer-interval>
+    <server-debug>
+      <debug-scope>
+        <name>weblogic.servlet.logging</name>
+        <enabled>true</enabled>
+      </debug-scope>
+      <debug-messaging>true</debug-messaging>
+      <debug-http>true</debug-http>
+      <debug-url-resolution>true</debug-url-resolution>
+      <debug-http-logging>true</debug-http-logging>
+      <debug-web-app-module>true</debug-web-app-module>
+      <debug-messaging-bridge-dump-to-log>true</debug-messaging-bridge-dump-to-log>
+      <debug-messaging-bridge-dump-to-console>true</debug-messaging-bridge-dump-to-console>
+    </server-debug>
+    <listen-address></listen-address>
+  </server>
+  <messaging-bridge>
+    <name>WLS12c_to_WildFly8_Bridge</name>
+    <target>myserver</target>
+    <source-destination>WLS_Source_Bridge</source-destination>
+    <target-destination>WildFly_Destination_Bridge</target-destination>
+    <selector></selector>
+    <quality-of-service>Atmost-once</quality-of-service>
+    <started>true</started>
+  </messaging-bridge>
+  <embedded-ldap>
+    <name>mydomain</name>
+    <credential-encrypted>{AES}xJkwV4DUSxbP0Tu8ompcx/sO2pXabHRIw9C9hjPiAdymZMeDV37HxQMN2hDYZOld</credential-encrypted>
+  </embedded-ldap>
+  <configuration-version>12.1.3.0.0</configuration-version>
+  <app-deployment>
+    <name>TestWebApp-1.0</name>
+    <target>myserver</target>
+    <module-type>war</module-type>
+    <source-path>/Users/jsensharma/NotBackedUp/MM_Tests/WLS/TestWLS_PluginProject copy/target/TestWebApp-1.0.war</source-path>
+    <security-dd-model>DDOnly</security-dd-model>
+    <staging-mode xsi:nil="true"></staging-mode>
+    <plan-staging-mode xsi:nil="true"></plan-staging-mode>
+    <cache-in-app-directory>false</cache-in-app-directory>
+  </app-deployment>
+  <app-deployment>
+    <name>TestWebApp</name>
+    <target>myserver</target>
+    <module-type>war</module-type>
+    <source-path>autodeploy/TestWebApp.war</source-path>
+    <security-dd-model>DDOnly</security-dd-model>
+    <staging-mode>nostage</staging-mode>
+    <plan-staging-mode xsi:nil="true"></plan-staging-mode>
+    <cache-in-app-directory>false</cache-in-app-directory>
+  </app-deployment>
+  <app-deployment>
+    <name>MyWebApp</name>
+    <target>myserver</target>
+    <module-type>war</module-type>
+    <source-path>SessionWebApp/MyWebApp</source-path>
+    <security-dd-model>DDOnly</security-dd-model>
+    <staging-mode>stage</staging-mode>
+    <plan-staging-mode xsi:nil="true"></plan-staging-mode>
+    <cache-in-app-directory>false</cache-in-app-directory>
+  </app-deployment>
+  <app-deployment>
+    <name>jms-notran-adp</name>
+    <target>myserver</target>
+    <module-type>rar</module-type>
+    <source-path>/Users/jsensharma/NotBackedUp/Installed/wls12130/wlserver/server/lib/jms-notran-adp.rar</source-path>
+    <security-dd-model>DDOnly</security-dd-model>
+    <staging-mode xsi:nil="true"></staging-mode>
+    <plan-staging-mode xsi:nil="true"></plan-staging-mode>
+    <cache-in-app-directory>false</cache-in-app-directory>
+  </app-deployment>
+  <jms-server>
+    <name>My_JMSServer</name>
+    <target>myserver</target>
+    <persistent-store xsi:nil="true"></persistent-store>
+  </jms-server>
+  <jms-bridge-destination>
+    <name>WLS_Source_Bridge</name>
+    <adapter-jndi-name>eis.jms.WLSConnectionFactoryJNDINoTX</adapter-jndi-name>
+    <user-name>weblogic</user-name>
+    <user-password-encrypted>{AES}MZthQtsuT4GH55R5es9TQFUOU8dK8tvLy5xJl5DcN1E=</user-password-encrypted>
+    <connection-factory-jndi-name>My_CF</connection-factory-jndi-name>
+    <connection-url>t3://localhost:7001</connection-url>
+    <destination-jndi-name>My_Q</destination-jndi-name>
+  </jms-bridge-destination>
+  <jms-bridge-destination>
+    <name>WildFly_Destination_Bridge</name>
+    <adapter-jndi-name>eis.jms.WLSConnectionFactoryJNDINoTX</adapter-jndi-name>
+    <user-name>jmsuser</user-name>
+    <user-password-encrypted>{AES}0hlGNKwgZkSw+YxjxJSAbkPJm0EnV5tn5Czd5CLTJgk=</user-password-encrypted>
+    <connection-factory-jndi-name>jms/RemoteConnectionFactory</connection-factory-jndi-name>
+    <initial-context-factory>org.jboss.naming.remote.client.InitialContextFactory</initial-context-factory>
+    <connection-url>http-remoting://localhost:8080</connection-url>
+    <destination-jndi-name>jms/queue/TestQ</destination-jndi-name>
+  </jms-bridge-destination>
+  <jms-system-resource>
+    <name>My_SystemModule</name>
+    <target>myserver</target>
+    <sub-deployment>
+      <name>Sub_My_Queue</name>
+      <target>My_JMSServer</target>
+    </sub-deployment>
+    <descriptor-file-name>jms/my_systemmodule-jms.xml</descriptor-file-name>
+  </jms-system-resource>
+  <admin-server-name>myserver</admin-server-name>
+</domain>

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<weblogic-jms xmlns="http://xmlns.oracle.com/weblogic/weblogic-jms" xmlns:sec="http://xmlns.oracle.com/weblogic/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wls="http://xmlns.oracle.com/weblogic/security/wls" xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-jms http://xmlns.oracle.com/weblogic/weblogic-jms/1.1/weblogic-jms.xsd">
+  <connection-factory name="My_ConnectionFactory">
+    <default-targeting-enabled>true</default-targeting-enabled>
+    <jndi-name>My_CF</jndi-name>
+    <default-delivery-params>
+      <default-unit-of-order>1</default-unit-of-order>
+    </default-delivery-params>
+    <security-params>
+      <attach-jmsx-user-id>false</attach-jmsx-user-id>
+    </security-params>
+  </connection-factory>
+  <queue name="My_Queue">
+    <sub-deployment-name>Sub_My_Queue</sub-deployment-name>
+    <jndi-name>My_Q</jndi-name>
+  </queue>
+</weblogic-jms>
