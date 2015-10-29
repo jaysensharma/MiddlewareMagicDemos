@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>middleware.magic</groupId>
+    <artifactId>WebLogic12_EJB_Client</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <java.version>1.7</java.version>
+        <middleware.home>/Users/jsensharma/NotBackedUp/Installed/wls12130</middleware.home> <!-- CHANGE ME !!! -->
+    </properties>
+    
+    <dependencies>
+        <dependency>
+        	<groupId>javax.ejb</groupId>
+        	<artifactId>ejb-api</artifactId>
+        	<version>3.0</version>
+            <scope>provided</scope>        	
+        </dependency>
+        <dependency>
+        	<groupId>weblogic</groupId>
+        	<artifactId>needed.jars</artifactId>
+        	<version>1.0</version>
+            <scope>system</scope>   
+            <systemPath>${middleware.home}/wlserver/server/lib/wlthint3client.jar</systemPath>     	
+        </dependency>        
+    </dependencies>
+    
+    <build>
+         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>2.3.2</version>
+               <configuration>
+                  <source>1.7</source>
+                  <target>1.7</target>
+               </configuration>
+            </plugin>
+
+            <!-- Allows the example to be run via 'mvn compile exec:java' -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <!--
+                    <mainClass>client.WebLogicEJBClient</mainClass>                    
+                    <includePluginDependencies>false</includePluginDependencies>
+                    -->
+                    <executable>java</executable>
+                       <arguments>
+                           <argument>-Xms512m</argument>
+                           <argument>-Xmx512m</argument>
+                           <argument>-XX:+PrintGCTimeStamps</argument>
+                           <argument>-XX:+PrintGCDetails</argument>
+                           <argument>-Xloggc:gc.log</argument>
+                           <argument>-classpath</argument>
+                           
+                           <!-- UNIX Based OS use the following classpath setting -->  <!-- CHANGE ME !!! -->
+                           <argument>${middleware.home}/wlserver/server/lib/wlthint3client.jar:target/WebLogic12_EJB_Client-1.0.jar:.:</argument>
+
+                           <!-- WINDOWS Based OS use the following classpath setting -->    <!-- CHANGE ME !!! -->
+                           <!-- <argument>${middleware.home}\wlserver\server\lib\wlthint3client.jar;target\WebLogic12_EJB_Client-1.0.jar;.;</argument> -->
+                           <argument>client.WebLogicEJBClient</argument>
+                       </arguments>
+                </configuration>
+            </plugin>
+         </plugins>
+     </build>
+     
+</project>
