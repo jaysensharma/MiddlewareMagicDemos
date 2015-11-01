@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>middleware.magic</groupId>
+  <artifactId>Apache_Camel_As_WebLogic12c_EJB_Client</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <name>Apache Camel As WebLogic 12c Based EJB Client</name>
+  <url>http://middlewaremagic.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <middleware.home>/Users/jsensharma/NotBackedUp/Installed/wls12130</middleware.home> <!-- CHANGE ME !!! -->
+  </properties>
+
+  <dependencies>   
+       <!-- Needed to have access to WebLogic related class access like "weblogic.jndi.WLInitialContextFactory" -->
+       <dependency>
+        	<groupId>weblogic</groupId>
+        	<artifactId>needed.jars</artifactId>
+        	<version>1.0</version>
+            <scope>system</scope>   
+            <systemPath>${middleware.home}/wlserver/server/lib/wlthint3client.jar</systemPath>     	
+       </dependency>  
+             
+       <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xbean</groupId>
+            <artifactId>xbean-spring</artifactId>
+            <version>3.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+          <dependency>
+             <groupId>log4j</groupId>
+             <artifactId>log4j</artifactId>
+             <version>1.2.15</version>
+             <exclusions>
+                <exclusion>
+                     <groupId>com.sun.jmx</groupId>
+                     <artifactId>jmxri</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>com.sun.jdmk</groupId>
+                     <artifactId>jmxtools</artifactId>
+                </exclusion>
+                <exclusion>
+                     <groupId>javax.jms</groupId>
+                     <artifactId>jms</artifactId>
+                </exclusion>
+             </exclusions>
+           </dependency>
+           <dependency>
+               <groupId>org.apache.camel</groupId>
+               <artifactId>camel-ejb</artifactId>
+               <version>2.15.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>6.0</version>
+                <scope>provided</scope>
+            </dependency>
+   </dependencies>
+
+   <pluginRepositories>
+      <pluginRepository>
+         <id>apache.snapshots</id>
+         <name>Apache Development Snapshot Repository</name>
+         <url>https://repository.apache.org/content/repositories/snapshots/</url>
+         <releases>
+            <enabled>false</enabled>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+      </pluginRepository>
+   </pluginRepositories>
+
+   <repositories>
+      <repository>
+         <id>apache.snapshots</id>
+         <name>Apache Development Snapshot Repository</name>
+         <url>https://repository.apache.org/content/repositories/snapshots/</url>
+         <releases>
+            <enabled>false</enabled>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+      </repository>
+   </repositories>
+   
+  <build>
+    <defaultGoal>install</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+
+      <!-- allows the route to be ran via 'mvn camel:run' -->
+      <plugin>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-maven-plugin</artifactId>
+        <version>2.15.4</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>

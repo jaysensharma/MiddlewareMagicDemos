@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:p="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <p:properties id="jndiProperties">
+        <prop key="java.naming.factory.initial">weblogic.jndi.WLInitialContextFactory</prop>
+        <prop key="java.naming.provider.url">t3://localhost:7001</prop>
+        <!--
+        <prop key="remote.connection.default.username">ejbuser</prop>
+        <prop key="remote.connection.default.password">ejbuser@123</prop>
+        -->
+    </p:properties>
+
+
+    <!-- setup Camel EJB component -->
+    <bean id="ejbComponent" class="org.apache.camel.component.ejb.EjbComponent">
+        <property name="properties" ref="jndiProperties"/>
+    </bean>
+    
+    <camel:camelContext xmlns="http://camel.apache.org/schema/spring">
+      <camel:route id="testCamelEJBClient">
+            <camel:from uri="timer:foo?period=5000"/>
+            <setBody>
+                <simple>MiddlewareMagic!!!</simple>
+            </setBody>
+            <!-- NOTE: "java:global/TestApp/TestEJB/HelloBean!ejb3.HelloRemote" is the JNDI name of WLS 12c deployed EJB -->
+            <camel:to uri="ejbComponent:java:global/TestApp/TestEJB/HelloBean!ejb3.HelloRemote?method=sayHello" />
+            
+            <camel:log message="[EJB Response] ===> ${body}" />
+      </camel:route>
+    </camel:camelContext>
+
+</beans>
+
+
