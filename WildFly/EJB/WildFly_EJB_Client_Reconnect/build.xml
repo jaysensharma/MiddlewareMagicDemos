@@ -1,0 +1,77 @@
+<project name="SingletonStartupService" default="all">
+<property name="jboss.home" value="/Users/jsensharma/NotBackedUp/Installed/wildfly-10.0.0.CR3-SNAPSHOT" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="test" />
+<property name="application.dir" value="build" />
+<property name="ear.name" value="TestEAR.ear" />
+<property name="ejb.one.jar" value="remoteEjbOne.jar" />
+<property name="client.jar.name" value="remoteEJBClient.jar" />
+
+        <path id="jboss.classpath">
+           <fileset dir="${jboss.module.dir}/system/layers/base/javax/ejb/api/main">
+               <include name="jboss-ejb-api*.jar"/>
+           </fileset>  
+        </path>
+
+        <!-- Client Needs the following Jar to be present in the CLASSPATH including -->
+        <path id="jboss.new.client.classpath">
+           <fileset dir="${jboss.home}/bin/client">
+               <include name="jboss-client.jar" />
+           </fileset>  
+        </path>
+	 
+        <target name="all" depends="buildEAR,message" />
+
+        <target name="buildEAR" >
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}/META-INF" />
+           <mkdir dir="${application.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="Caller*.java" classpathref="jboss.classpath"/>
+           <copy file="${src.dir}/CallerBean.java" todir="${tmp.dir}/ejb/one"/>
+           <copy file="${src.dir}/CallerRemote.java" todir="${tmp.dir}/ejb/one"/>
+           <jar jarfile="${output.dir}/${ejb.one.jar}" basedir="${tmp.dir}" compress="true" />
+
+           <mkdir dir="${output.dir}/META-INF"/>
+           <copy todir="${output.dir}/META-INF">
+                <fileset dir="${src.dir}/">
+                  <include name="application.xml"/> 
+                </fileset>
+           </copy>           
+           <jar jarfile="${application.dir}/${ear.name}" basedir="${output.dir}" compress="true" />
+           <delete includeEmptyDirs="true">
+              <fileset dir="${output.dir}"/>
+           </delete> 
+           <delete dir="${tmp.dir}" />
+        </target>
+
+        <target name="message" depends="buildEAR">
+            <echo message="*******************  ******************* *********************" />  
+            <copy file="${application.dir}/${ear.name}" tofile="${jboss.home}/standalone/deployments/${ear.name}"/>
+            <echo message="********** ${application.dir}/${ear.name} Build and Deployed Successfully **********" />  
+            <echo message="*******************  ******************* *********************" />  
+        </target>
+
+        <target name="run">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}" destdir="${tmp.dir}"  includes="CallerRemote.java,Client.java" classpathref="jboss.classpath"/> 
+           <copy file="${src.dir}/CallerRemote.java" todir="${tmp.dir}/ejb3"/>
+           <copy file="${src.dir}/Client.java" todir="${tmp.dir}/client"/>    
+           <copy file="${src.dir}/jboss-ejb-client.properties" todir="${tmp.dir}"/>     
+           <jar jarfile="${application.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+
+           <java classname="client.Client" fork="true">
+               <classpath>
+                  <pathelement location="${application.dir}/${client.jar.name}"/>
+                  <path refid="jboss.new.client.classpath"/>
+               </classpath>
+           </java>
+        </target>        
+    
+</project>
+
+
