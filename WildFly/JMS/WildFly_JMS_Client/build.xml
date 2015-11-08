@@ -1,0 +1,46 @@
+<project name="WildFly_Jms_Client" default="runSender">
+<property name="jboss.home" value="/Users/jsensharma/NotBackedUp/Installed/wildfly-8.2.1.Final" />
+<property name="jboss.module.dir" value="${jboss.home}/modules" />
+<property name="basedir" value="." />
+<property name="tmp.dir" value="tmp" />
+<property name="src.dir" value="src" />
+<property name="output.dir" value="build" />
+<property name="client.jar.name" value="wildfly_jms_client.jar" />
+
+        <!-- Client Needs the following Jar to be present in the CLASSPATH including -->
+        <path id="jboss.new.client.classpath">
+           <fileset dir="${jboss.home}/bin/client">
+               <include name="jboss-client.jar" />
+           </fileset>  
+        </path>
+
+        <target name="runSender">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}/client" destdir="${tmp.dir}"  includes="WildFlyJmsQueueSender.java" classpathref="jboss.new.client.classpath"/> 
+           <copy file="${src.dir}/client/WildFlyJmsQueueSender.java" todir="${tmp.dir}/client"/>        
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+           <java classname="client.WildFlyJmsQueueSender" fork="true" classpathref="jboss.new.client.classpath">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+               </classpath>
+           </java>
+        </target>     
+
+        <target name="runReceive">
+           <delete dir="${tmp.dir}" />
+           <mkdir dir="${tmp.dir}" />
+           <javac srcdir="${src.dir}/client" destdir="${tmp.dir}"  includes="WildFlyJmsQueueReceive.java" classpathref="jboss.new.client.classpath"/> 
+           <copy file="${src.dir}/client/WildFlyJmsQueueReceive.java" todir="${tmp.dir}/client"/>        
+           <jar jarfile="${output.dir}/${client.jar.name}" basedir="${tmp.dir}" compress="true" />
+           <delete dir="${tmp.dir}"/>
+           <java classname="client.WildFlyJmsQueueReceive" fork="true" classpathref="jboss.new.client.classpath">
+               <classpath>
+                  <pathelement location="${output.dir}/${client.jar.name}"/>
+               </classpath>
+           </java>
+        </target>             
+</project>
+
+
