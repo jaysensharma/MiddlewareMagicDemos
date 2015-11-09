@@ -16,5 +16,5 @@ The aim of this repository is to share some simple demos related to various tech
 
 <a href="https://twitter.com/middlewaremagic">https://twitter.com/middlewaremagic</a>
 
-< ahref="https://www.linkedin.com/grp/home?gid=8403306">https://www.linkedin.com/grp/home?gid=8403306</a>
+<a href="https://www.linkedin.com/grp/home?gid=8403306">https://www.linkedin.com/grp/home?gid=8403306</a>
 
