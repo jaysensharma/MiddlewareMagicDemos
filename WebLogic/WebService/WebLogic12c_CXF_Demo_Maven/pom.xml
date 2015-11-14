@@ -1,0 +1,124 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>middleware.magic</groupId>
+    <artifactId>WebLogic12c_CXF_Demo</artifactId>
+    <packaging>war</packaging>
+    <name>WSDL first demo on WenLogic 12.2.1</name>
+    <version>1.0</version>
+    <description>A very simple demo showing how to develop and use a CXF based WebService on WebLogic 12.2.1</description>
+
+    <properties>
+        <cxf.version>3.1.4</cxf.version>
+        <cxf.xjc-utils.version>3.0.5</cxf.xjc-utils.version>
+        <spring.version>4.1.4.RELEASE</spring.version>
+    </properties>
+    
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <finalName>WebLogic_CXF_Demo</finalName>   <!-- WAR name -->
+        
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.1</version>
+                    <configuration>
+                        <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                        <webResources>
+                            <resource>
+                                <directory>src/main/resources</directory>
+                                <targetPath>WEB-INF</targetPath>
+                                <includes>
+                                    <include>*.wsdl</include>
+                                </includes>
+                            </resource>
+                        </webResources>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+        <plugins>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>${cxf.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>src/main/resources/helloworld.wsdl</wsdl>  <!-- Where the original WSDL is present -->
+                                    <wsdlLocation>WEB-INF/wsdl/helloworld.wsdl</wsdlLocation>  <!-- Where to place the WSDL -->
+                                    <bindingFiles>
+                                        <bindingFile>src/main/resources/binding.xml</bindingFile>
+                                    </bindingFiles>
+                                    <extraargs>
+                                        <!-- <extraarg>-impl</extraarg> -->  <!-- will generate a dummy  webservice implementation -->
+                                        <extraarg>-verbose</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>    
+
+
+            <plugin> 
+              <groupId>com.oracle.weblogic</groupId> 
+              <artifactId>weblogic-maven-plugin</artifactId> 
+              <version>12.2.1-0-0</version> 
+              <configuration> 
+                  <adminurl>t3://localhost:7001</adminurl>
+                  <user>weblogic</user> 
+                  <password>weblogic1</password> 
+                  <upload>true</upload> 
+                  <action>deploy</action> 
+                  <remote>false</remote> 
+                  <verbose>true</verbose> 
+                  <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source> 
+                  <name>${project.build.finalName}</name> 
+              </configuration> 
+           </plugin>                   
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.xjc-utils</groupId>
+            <artifactId>cxf-xjc-runtime</artifactId>
+            <version>${cxf.xjc-utils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+       </dependency>
+    </dependencies>
+</project>

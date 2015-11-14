@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mid="http://middlewaremagic.com">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <mid:sayHello>
+         <mid:name>MiddlewareMagic!!!</mid:name>
+      </mid:sayHello>
+   </soapenv:Body>
+</soapenv:Envelope>

@@ -1,0 +1,48 @@
+<project name="webservices-hello_world" default="deploy">
+
+  <property name="src" value="src" />
+  <property name="build" value="build" />
+  <property name="wls.home" value="/Users/jsensharma/NotBackedUp/Installed/wls1221" /> <!-- CHANGE ME!! -->
+  <property name="wls.username" value="weblogic" />
+  <property name="wls.password" value="weblogic1" />
+  <property name="wls.hostname" value="localhost" />
+  <property name="wls.port" value="7001" />
+  <property name="deploy.target" value="AdminServer" />
+  
+  <property name="war.name" value="WebLogic_CXF_Demo" />
+  <property name="war.deploy.src" value="target/WebLogic_CXF_Demo.war" />
+
+<!--
+  <path id="wls.classpath">
+     <fileset dir="${wls.home}">
+          <include name="**/*.jar"/>
+      </fileset>
+  </path>
+-->
+  <path id="wls.classpath">
+     <fileset dir="${wls.home}">
+          <include name="wlserver/modules/features/wlst.wls.classpath.jar"/>
+      </fileset>
+  </path>
+
+  <taskdef name="wldeploy" classname="weblogic.ant.taskdefs.management.WLDeploy" classpathref="wls.classpath" />
+
+  <target name="deploy">
+     <wldeploy action="deploy" name="${war.name}"
+      source="${war.deploy.src}" user="${wls.username}"
+      stage="true" password="${wls.password}" verbose="true"
+      adminurl="t3://${wls.hostname}:${wls.port}"
+      targets="${deploy.target}" 
+      />
+  </target>
+
+  <target name="undeploy">
+     <wldeploy action="undeploy" name="${war.name}"
+      user="${wls.username}" password="${wls.password}" 
+      verbose="true"
+      adminurl="t3://${wls.hostname}:${wls.port}"
+      targets="${deploy.target}" 
+      />
+  </target>    
+  
+</project>
