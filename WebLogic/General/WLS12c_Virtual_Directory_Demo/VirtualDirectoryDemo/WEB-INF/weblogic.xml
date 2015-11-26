@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<weblogic-web-app  xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                   xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app 
+                   http://xmlns.oracle.com/weblogic/weblogic-web-app/1.6/weblogic-web-app.xsd">  <!-- Weblogic 12c -->
+	<virtual-directory-mapping>
+		<local-path>/Users/jsensharma/Pictures</local-path>
+		<url-pattern>*.jpg</url-pattern>
+		<url-pattern>*.png</url-pattern>
+		<url-pattern>/static/*</url-pattern>
+	</virtual-directory-mapping>
+</weblogic-web-app>
