@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>middleware.magic</groupId>
+  <artifactId>WildFlyServerSideJavaScript</artifactId>
+  <version>1.0</version>
+  <packaging>war</packaging>
+  <name>WildFlyServerSideJavaScript</name>
+  
+  <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+        <version.wildfly.bom>10.0.0.CR2</version.wildfly.bom>
+        <version.wildfly-maven-plugin>1.0.2.Final</version.wildfly-maven-plugin>
+        
+        <!-- Compiler Related versions -->
+        <version.war.plugin>2.5</version.war.plugin>
+        <version.maven.compiler.plugin>3.3</version.maven.compiler.plugin>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+  </properties>  
+  
+  
+  <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>org.wildfly.bom</groupId>
+            <artifactId>jboss-javaee-7.0-wildfly</artifactId>
+            <version>${version.wildfly.bom}</version>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+  </dependencyManagement> 
+
+  <dependencies>
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-web-api</artifactId>
+      <version>7.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.37</version>
+   </dependency>
+  </dependencies>
+  
+  <build>
+   <finalName>WildFlyServerSideJavaScript</finalName>   <!-- WAR name -->
+   <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${version.maven.compiler.plugin}</version>
+        <configuration>
+          <source>${maven.compiler.target}</source>
+          <target>${maven.compiler.source}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${version.war.plugin}</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+        
+        <!-- The WildFly Maven Plugin deploys your war to a local WildFly container -->
+        <!-- To use, set the JBOSS_HOME environment variable and run:
+             mvn package wildfly:deploy                            
+        -->
+      <plugin>
+         <groupId>org.wildfly.plugins</groupId>
+         <artifactId>wildfly-maven-plugin</artifactId>
+         <version>${version.wildfly-maven-plugin}</version>
+      </plugin>
+   </plugins>
+  </build>
+  
+</project>
