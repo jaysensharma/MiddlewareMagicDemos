@@ -9,7 +9,7 @@ var getConnection = function() {
     try {
         properties.setProperty("user", "root");
         properties.setProperty("password", "testpwd");
-        conn = driver.connect("jdbc:mysql://localhost:3307/TestJavaScriptDB", properties);
+        conn = driver.connect("jdbc:mysql://localhost:3306/TestJavaScriptDB", properties);
         return conn;
     } finally {
     
