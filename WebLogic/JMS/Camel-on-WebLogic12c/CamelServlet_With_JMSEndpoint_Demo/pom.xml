@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>my.camel.servlet.demo</groupId>
+	<artifactId>HelloCamelServletWebApp</artifactId>
+	<version>1.0</version>
+	<packaging>war</packaging>
+	<name>HelloCamelServletWebApp Demo</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.compiler.plugin>2.3.1</version.compiler.plugin>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		
+		<!-- Camel and Spring related properties -->
+		<version.apache.camel>2.16.0</version.apache.camel>
+		<version.spring>4.1.6.RELEASE</version.spring>
+		
+		<!-- Weblogic Plugin related properties -->
+		<middleware.home>/Users/jsensharma/NotBackedUp/Installed/wls1221</middleware.home>
+        <admin.server.url>t3://localhost:7001</admin.server.url>
+        <admin.username>weblogic</admin.username>
+        <admin.password>weblogic1</admin.password>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${version.spring}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring</artifactId>
+			<version>${version.apache.camel}</version>
+
+			<!-- As we do not want the following JARs inside the "WEB-INF/lib" Hence 
+				excluding them : 
+                                                 jaxb-api-2.2.7.jar 
+                                                 jaxb-core-2.2.7.jar 
+                                                 jaxb-impl-2.2.7.jar -->
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-servlet</artifactId>
+			<version>${version.apache.camel}</version>
+			<!-- As we do not want the following JARs inside the "WEB-INF/lib" Hence 
+				excluding them : 
+                                                 jaxb-api-2.2.7.jar 
+                                                 jaxb-core-2.2.7.jar 
+                                                 jaxb-impl-2.2.7.jar -->
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jms</artifactId>
+            <version>${version.apache.camel}</version>
+			<!-- As we do not want the following JARs inside the "WEB-INF/lib" Hence 
+				excluding them : 
+                                                 jaxb-api-2.2.7.jar 
+                                                 jaxb-core-2.2.7.jar 
+                                                 jaxb-impl-2.2.7.jar -->
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-core</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.compiler.plugin}</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+                <groupId>com.oracle.weblogic</groupId> 
+                <artifactId>weblogic-maven-plugin</artifactId> 
+                <version>12.2.1-0-0</version> 
+                <configuration> 
+                    <middlewareHome>${middleware.home}</middlewareHome>
+                    <adminurl>${admin.server.url}</adminurl>
+                    <user>${admin.username}</user>
+                    <password>${admin.password}</password>
+                    <name>${project.build.finalName}</name>
+                    <upload>true</upload> 
+                    <action>deploy</action> 
+                    <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>          
+                </configuration> 
+            </plugin>
+		</plugins>
+	</build>
+
+</project>

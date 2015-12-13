@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:p="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+     <bean id="mathBean" class="beans.MathBean" />
+
+     <camelContext xmlns="http://camel.apache.org/schema/spring">
+       <route id="addNumbersRoute">
+           <from uri="servlet:///addNumbers"/>
+           <transform>
+               <method bean="mathBean" method="addTwoNumbers(${header.firstNumber},${header.secondNumber})"/> 
+           </transform>
+           <inOnly uri="weblogicJMS:My_Q" />
+       </route>
+     </camelContext>
+
+
+     <!-- WebLogic JndiTemplate Settings --> 
+     <bean id="jmsJndiTemplate" class="org.springframework.jndi.JndiTemplate">
+           <property name="environment">
+              <props>
+                 <prop key="java.naming.factory.initial">weblogic.jndi.WLInitialContextFactory</prop>
+                 <prop key="java.naming.provider.url">t3://localhost:7001</prop>
+              </props>
+           </property>
+     </bean>
+
+     <bean id="jndiDestinationResolver" class="org.springframework.jms.support.destination.JndiDestinationResolver">
+          <property name="jndiTemplate" ref="jmsJndiTemplate"/>
+     </bean>
+
+     <bean id="jmsConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+          <property name="jndiTemplate" ref="jmsJndiTemplate"/>
+          <property name="jndiName" value="My_CF"/>
+     </bean>
+     
+     <bean id="jmsConfiguration" class="org.apache.camel.component.jms.JmsConfiguration">
+          <property name="connectionFactory" ref="jmsConnectionFactory"/>
+          <property name="destinationResolver" ref="jndiDestinationResolver"/>
+     </bean>
+          
+     <bean id="weblogicJMS" class="org.apache.camel.component.jms.JmsComponent">
+          <property name="configuration" ref="jmsConfiguration" />
+     </bean>
+
+</beans>
