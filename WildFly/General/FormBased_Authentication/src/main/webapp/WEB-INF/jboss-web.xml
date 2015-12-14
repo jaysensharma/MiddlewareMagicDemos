@@ -1,0 +1,3 @@
+<jboss-web>
+    <security-domain>java:/jaas/form-security-domain</security-domain>
+</jboss-web>

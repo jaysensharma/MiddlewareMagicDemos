@@ -1,0 +1,65 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0"> 
+
+  <welcome-file-list>
+      <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+  
+  <listener>
+    <listener-class>com.listener.MyListener</listener-class>
+  </listener>
+ 
+  <filter>
+      <filter-name>LoginFilter</filter-name>
+      <filter-class>com.filter.LoginFilter</filter-class>
+  </filter>
+  <filter-mapping>
+      <filter-name>LoginFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- Roles -->
+  <security-role>
+    <description>Any role</description>
+    <role-name>*</role-name>
+  </security-role>
+       
+ <!-- Resource / Role Mapping 
+  <security-constraint>
+    <display-name>Area secured</display-name>
+    <web-resource-collection>
+      <web-resource-name>protected_resources</web-resource-name>
+      <url-pattern>/*</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+    <auth-constraint>
+      <description>User with any role</description>
+      <role-name>*</role-name>
+    </auth-constraint>
+  </security-constraint>
+ -->
+ 
+  <security-constraint>
+    <web-resource-collection>
+       <web-resource-name>protected_resources</web-resource-name>
+       <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <description>User with any role</description>
+      <role-name>*</role-name>
+    </auth-constraint>    
+  </security-constraint>
+  
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <realm-name>form-security-domain</realm-name>
+    <form-login-config>
+            <form-login-page>/login.html</form-login-page>
+            <form-error-page>/error.html</form-error-page>
+        </form-login-config>
+  </login-config>
+</web-app>
+
