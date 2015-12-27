@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>middleware.magic</groupId>
+    <artifactId>JMX_Over_SSL</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <java.version>1.7</java.version>
+        <middleware.home>/Users/jsensharma/NotBackedUp/Installed/wls1221</middleware.home> <!-- CHANGE ME !!! -->
+    </properties>
+    
+    <dependencies>
+        <dependency>
+        	<groupId>weblogic</groupId>
+        	<artifactId>wlthint3client.needed.jars</artifactId>
+        	<version>1.0</version>
+            <scope>system</scope>   
+            <systemPath>${middleware.home}/wlserver/server/lib/wlthint3client.jar</systemPath>     	
+        </dependency>   
+        <dependency>
+        	<groupId>weblogic</groupId>
+        	<artifactId>com.bea.core.management.jmx.jars</artifactId>
+        	<version>1.0</version>
+            <scope>system</scope>   
+            <systemPath>${middleware.home}/wlserver/modules/com.bea.core.management.jmx.jar</systemPath>     	
+        </dependency>   
+        <dependency>
+        	<groupId>weblogic</groupId>
+        	<artifactId>wls-api.jars</artifactId>
+        	<version>1.0</version>
+            <scope>system</scope>   
+            <systemPath>${middleware.home}/wlserver/server/lib/wls-api.jar</systemPath>     	
+        </dependency>                       
+    </dependencies>
+    
+    <build>
+         <defaultGoal>install</defaultGoal>
+         <finalName>${project.artifactId}</finalName>
+         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>2.3.2</version>
+               <configuration>
+                  <source>1.7</source>
+                  <target>1.7</target>
+               </configuration>
+            </plugin>
+
+            <!-- Allows the example to be run via 'mvn compile exec:exec' -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <executable>java</executable>
+                       <arguments>
+                           <argument>-Davax.net.ssl.trustStorePassword=middleware+magic+client</argument>         <!-- CHANGE ME !!! -->
+                           <argument>-Djavax.net.ssl.trustStore=${basedir}/WLST_and_Keys/Keystores/clientTrustStore.keystore</argument>   <!-- CHANGE ME !!! -->
+                           <argument>-classpath</argument>
+                           <!-- UNIX Based OS use the following classpath setting -->                             <!-- CHANGE ME !!! -->
+                           <argument>${middleware.home}/wlserver/server/lib/wlthint3client.jar:${middleware.home}/wlserver/server/lib/wls-api.jar:${middleware.home}/wlserver/modules/com.bea.core.management.jmx.jar:target/${project.artifactId}.jar:.:</argument>
+
+                           <!-- WINDOWS Based OS use the following classpath setting -->                          <!-- CHANGE ME !!! -->
+                           <!-- <argument>${middleware.home}/wlserver/server/lib/wlthint3client.jar;${middleware.home}/wlserver/server/lib/wls-api.jar;${middleware.home}/wlserver/modules/com.bea.core.management.jmx.jar;target/${project.artifactId}.jar;.;</argument> -->
+                           <argument>client.SecureJMXClient</argument>
+                       </arguments>
+                </configuration>
+            </plugin>
+         </plugins>
+     </build>
+     
+</project>
+
+
+<!--  ######   For those who wants to run the "client.SecureJMXClient" manually do the following:
+
+export MW_HOME=/Users/jsensharma/NotBackedUp/Installed/wls1221
+
+export CLASSPATH=$MW_HOME/wlserver/server/lib/wlthint3client.jar:$MW_HOME/wlserver/server/lib/wls-api.jar:$MW_HOME/wlserver/modules/com.bea.core.management.jmx.jar:.:
+
+java   -Davax.net.ssl.trustStorePassword=middleware+magic+client   -Djavax.net.ssl.trustStore=${basedir}/ClientKey/client.keystore  client.SecureJMXClient
+-->
