@@ -79,7 +79,7 @@
                            <classpath/>   
     <!--CHANGE ME!!! -->   <!--argument>-Djavax.net.debug=all</argument -->       <!-- Use this only for debugging purpose -->                                        
     <!--CHANGE ME!!! -->   <argument>-Djavax.net.ssl.trustStorePassword=middleware+magic+client</argument>
-    <!--CHANGE ME!!! -->   <argument>-Djavax.net.ssl.trustStore=/Users/jsensharma/NotBackedUp/MM_Tests/WildFly/EJB_SSL_Wildfly10/keystores/clientTrustStore.keystoreA</argument>
+    <!--CHANGE ME!!! -->   <argument>-Djavax.net.ssl.trustStore=/Users/jsensharma/NotBackedUp/MM_Tests/WildFly/EJB_SSL_Wildfly10/keystores/clientTrustStore.keystore</argument>
                            <argument>client.StandaloneClient</argument>                 
                        </arguments>
                 </configuration>                
