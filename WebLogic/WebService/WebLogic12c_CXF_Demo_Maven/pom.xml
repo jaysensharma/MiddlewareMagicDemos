@@ -48,6 +48,7 @@
             </plugins>
         </pluginManagement>
         
+        
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -60,15 +61,10 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>src/main/resources/helloworld.wsdl</wsdl>  <!-- Where the original WSDL is present -->
-                                    <wsdlLocation>WEB-INF/wsdl/helloworld.wsdl</wsdlLocation>  <!-- Where to place the WSDL -->
+                                    <wsdl>src/main/resources/helloworld.wsdl</wsdl>
                                     <bindingFiles>
                                         <bindingFile>src/main/resources/binding.xml</bindingFile>
                                     </bindingFiles>
-                                    <extraargs>
-                                        < <extraarg>-impl</extraarg>  <!-- will generate a dummy  webservice implementation -->
-                                        <extraarg>-verbose</extraarg>
-                                    </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -94,8 +90,18 @@
                   <verbose>true</verbose> 
                   <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source> 
                   <name>${project.build.finalName}</name> 
-              </configuration> 
-           </plugin>                   
+             </configuration> 
+      <!-- 
+      <executions> 
+         <execution> 
+            <phase>install</phase> 
+              <goals> 
+                <goal>deploy</goal> 
+              </goals> 
+         </execution> 
+       </executions> 
+       --> 
+  </plugin>                   
         </plugins>
     </build>
 

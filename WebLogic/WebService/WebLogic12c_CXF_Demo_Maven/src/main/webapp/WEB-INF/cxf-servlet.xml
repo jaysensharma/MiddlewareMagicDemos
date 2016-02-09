@@ -11,7 +11,7 @@
     <jaxws:endpoint xmlns:hello="http://middlewaremagic.com/"
             id="HelloWorldHTTP" address="/HelloWorld"
             serviceName="hello:HelloWorldService" endpointName="hello:HelloWorldPort"
-            implementor="com.middlewaremagic.HelloWorldImpl">
+            implementor="com.middlewaremagic.HelloWorld_Impl">
     </jaxws:endpoint>
 
 </beans>
