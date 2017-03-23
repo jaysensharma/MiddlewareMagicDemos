@@ -39,7 +39,7 @@ public class CreateTableUsingHBaseAPIs {
 How to build and run?
 
 # cd /PATH/TO/HBase_Client
-# mvn clean install exec:run
+# mvn clean install exec:java
 
 */
 
